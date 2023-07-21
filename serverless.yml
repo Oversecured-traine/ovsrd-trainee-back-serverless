@@ -1,0 +1,18 @@
+service: task-tracker
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1 
+
+functions:
+  getMessage:
+    handler: getMessage.handler
+    name: get-message
+    events:
+      - http:
+          path: /
+          method: GET
+
+plugins:
+  - serverless-offline
