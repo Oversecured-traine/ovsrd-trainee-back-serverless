@@ -30,12 +30,118 @@ custom:
   cardsTableName: adavydova-cards
 
 functions:
-  getMessage:
-    handler: getMessage.handler
-    name: get-message
+  # ColumnController methods
+  createColumn:
+    handler: src/columnController.createColumn
     events:
       - http:
-          path: /
+          path: /columns
+          method: POST
+
+  getColumn:
+    handler: src/columnController.getColumn
+    events:
+      - http:
+          path: /columns/{columnId}
+          method: GET
+
+  updateColumn:
+    handler: src/columnController.updateColumn
+    events:
+      - http:
+          path: /columns/{columnId}
+          method: PUT
+
+  deleteColumn:
+    handler: src/columnController.deleteColumn
+    events:
+      - http:
+          path: /columns/{columnId}
+          method: DELETE
+
+  getColumns:
+    handler: src/columnController.getColumns
+    events:
+      - http:
+          path: /columns
+          method: GET
+
+  getSortedColumns:
+    handler: src/columnController.getSortedColumns
+    events:
+      - http:
+          path: /columns/sorted
+          method: GET
+
+  getMaxColumnIndex:
+    handler: src/columnController.getMaxColumnIndex
+    events:
+      - http:
+          path: /columns/maxIndex
+          method: GET
+
+  # CardController methods
+  createCard:
+    handler: src/cardController.createCard
+    events:
+      - http:
+          path: /cards
+          method: POST
+
+  getCard:
+    handler: src/cardController.getCard
+    events:
+      - http:
+          path: /cards/{cardId}
+          method: GET
+
+  updateCard:
+    handler: src/cardController.updateCard
+    events:
+      - http:
+          path: /cards/{cardId}
+          method: PUT
+
+  deleteCard:
+    handler: src/cardController.deleteCard
+    events:
+      - http:
+          path: /cards/{cardId}
+          method: DELETE
+
+  getCards:
+    handler: src/cardController.getCards
+    events:
+      - http:
+          path: /cards
+          method: GET
+
+  getCardsByColumnID:
+    handler: src/cardController.getCardsByColumnID
+    events:
+      - http:
+          path: /columns/{columnId}/cards
+          method: GET
+
+  getSortedCards:
+    handler: src/cardController.getSortedCards
+    events:
+      - http:
+          path: /cards/sorted
+          method: GET
+
+  moveCard:
+    handler: src/cardController.move
+    events:
+      - http:
+          path: /cards/{cardId}/move
+          method: POST
+
+  getMaxCardIndex:
+    handler: src/cardController.getMaxCardIndex
+    events:
+      - http:
+          path: /columns/{columnId}/maxIndex
           method: GET
 
 resources:

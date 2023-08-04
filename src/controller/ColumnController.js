@@ -81,7 +81,7 @@ class ColumnController {
 
         try {
             const  columnId  = event.pathParameters.columnId;
-            const  columnTitle  = event.pathParameters.columnTitle;
+            const  columnTitle  = JSON.parse(event.body.columnTitle);
             const operationResponse = await this.service.updateColumn(columnId, columnTitle);
             response.body = JSON.stringify({
                 message: 'Successfully updated a column.',

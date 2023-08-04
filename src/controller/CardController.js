@@ -82,7 +82,7 @@ class CardController {
 
         try {
             const  cardId  = event.pathParameters.cardId;
-            const  cardTitle  = event.pathParameters.cardTitle;
+            const  cardTitle  = JSON.parse(event.body.cardTitle);
             const operationResponse = await this.service.updateCard(cardId, cardTitle);
             response.body = JSON.stringify({
                 message: 'Successfully updated a card.',
