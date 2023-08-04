@@ -2,8 +2,32 @@ service: task-tracker
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
+  profile: cyberberry
+  stage: dev
   region: us-east-1 
+  enviroment:
+    COLUMNS_TABLE_NAME: ${self.custom.columnsTableName}
+    CARDS_TABLE_NAME: ${self.custom.cardsTableName}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "*"
+
+plugins:
+  - serverless-offline
+
+custom: 
+  columnsTableName: adavydova-columns
+  cardsTableName: adavydova-cards
 
 functions:
   getMessage:
@@ -14,5 +38,56 @@ functions:
           path: /
           method: GET
 
-plugins:
-  - serverless-offline
+resources:
+  Resources:
+    ColumnsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+      TableName: ${self:custom.columnsTableName}
+      AttributeDefinitions: 
+        - AttributeName: columnID
+          AttributeType: S
+        - AttributeName: columnIndex
+          AttributeType: N  
+      KeySchema:
+        - AttributeName: columnID
+          KeyType: Hash
+      GlobalSecondaryIndexes:
+          - IndexName: columnsByIndex
+            KeySchema:
+              - AttributeName: columnIndex
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+    CardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+      TableName: ${self:custom.cardsTableName}
+      AttributeDefinitions: 
+        - AttributeName: cardID
+          AttributeType: S
+        - AttributeName: columnID
+          AttributeType: S
+        - AttributeName: cardIndex
+          AttributeType: N  
+      KeySchema:
+        - AttributeName: cardID
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+          - IndexName: cardsByColumnIdAndIndex
+            KeySchema:
+              - AttributeName: columnID
+                KeyType: HASH
+              - AttributeName: cardIndex
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+  
