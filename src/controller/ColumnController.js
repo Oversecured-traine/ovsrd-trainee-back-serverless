@@ -1,4 +1,4 @@
-const ColumnService = require('../service/');
+const ColumnService = require('../service/ColumnService');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
 
 class ColumnController {

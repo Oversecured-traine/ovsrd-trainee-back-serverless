@@ -1,4 +1,4 @@
-const CardService = require('../service/');
+const CardService = require('../service/CardService');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
 
 class CardController {

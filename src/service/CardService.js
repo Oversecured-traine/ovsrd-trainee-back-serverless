@@ -1,4 +1,4 @@
-const CardRepository = require('../repository/');
+const CardRepository = require('../repository/CardRepository');
 
 class CardService {
 

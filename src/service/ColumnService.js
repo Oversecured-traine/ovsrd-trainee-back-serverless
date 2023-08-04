@@ -1,5 +1,5 @@
-const ColumnRepository = require('../repository/');
-const CardService = require('../service/');
+const ColumnRepository = require('../repository/ColumnRepository');
+const CardService = require('../service/CardService');
 
 class ColumnService {
 
