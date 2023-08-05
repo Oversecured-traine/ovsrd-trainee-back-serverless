@@ -3,12 +3,12 @@ service: task-tracker
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: cyberberry
+  profile: Oleksandra-developer
   stage: dev
-  region: us-east-1 
-  enviroment:
-    COLUMNS_TABLE_NAME: ${self.custom.columnsTableName}
-    CARDS_TABLE_NAME: ${self.custom.cardsTableName}
+  region: ${self:custom.region} 
+  environment:
+    COLUMNS_TABLE_NAME: ${self:custom.columnsTableName}
+    CARDS_TABLE_NAME: ${self:custom.cardsTableName}
   iam:
     role:
       statements:
@@ -20,14 +20,13 @@ provider:
             - dynamodb:PutItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
           Resource: "*"
-
-plugins:
-  - serverless-offline
 
 custom: 
   columnsTableName: adavydova-columns
   cardsTableName: adavydova-cards
+  region: eu-west-1
 
 functions:
   # ColumnController methods
@@ -37,13 +36,15 @@ functions:
       - http:
           path: /columns
           method: POST
+          cors: true
 
   getColumn:
     handler: src/controller/ColumnController.getColumn
     events:
       - http:
           path: /columns/{columnId}
-          method: GET
+          method: GET          
+          cors: true
 
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
@@ -51,6 +52,7 @@ functions:
       - http:
           path: /columns/{columnId}
           method: PUT
+          cors: true
 
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
@@ -58,6 +60,7 @@ functions:
       - http:
           path: /columns/{columnId}
           method: DELETE
+          cors: true
 
   getColumns:
     handler: src/controller/ColumnController.getColumns
@@ -65,6 +68,7 @@ functions:
       - http:
           path: /columns
           method: GET
+          cors: true
 
   getSortedColumns:
     handler: src/controller/ColumnController.getSortedColumns
@@ -72,6 +76,7 @@ functions:
       - http:
           path: /columns/sorted
           method: GET
+          cors: true
 
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
@@ -79,6 +84,7 @@ functions:
       - http:
           path: /columns/maxIndex
           method: GET
+          cors: true
 
   # CardController methods
   createCard:
@@ -87,6 +93,7 @@ functions:
       - http:
           path: /cards
           method: POST
+          cors: true
 
   getCard:
     handler: src/controller/CardController.getCard
@@ -94,6 +101,7 @@ functions:
       - http:
           path: /controller/cards/{cardId}
           method: GET
+          cors: true
 
   updateCard:
     handler: src/controller/CardController.updateCard
@@ -101,6 +109,7 @@ functions:
       - http:
           path: /cards/{cardId}
           method: PUT
+          cors: true
 
   deleteCard:
     handler: src/controller/CardController.deleteCard
@@ -108,6 +117,7 @@ functions:
       - http:
           path: /cards/{cardId}
           method: DELETE
+          cors: true
 
   getCards:
     handler: src/controller/CardController.getCards
@@ -115,6 +125,7 @@ functions:
       - http:
           path: /cards
           method: GET
+          cors: true
 
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
@@ -122,6 +133,7 @@ functions:
       - http:
           path: /columns/{columnId}/cards
           method: GET
+          cors: true
 
   getSortedCards:
     handler: src/controller/CardController.getSortedCards
@@ -129,6 +141,7 @@ functions:
       - http:
           path: /cards/sorted
           method: GET
+          cors: true
 
   moveCard:
     handler: src/controller/CardController.move
@@ -136,6 +149,7 @@ functions:
       - http:
           path: /cards/{cardId}/move
           method: POST
+          cors: true
 
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
@@ -143,22 +157,23 @@ functions:
       - http:
           path: /columns/{columnId}/maxIndex
           method: GET
+          cors: true
 
 resources:
   Resources:
     ColumnsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-      TableName: ${self:custom.columnsTableName}
-      AttributeDefinitions: 
-        - AttributeName: columnID
-          AttributeType: S
-        - AttributeName: columnIndex
-          AttributeType: N  
-      KeySchema:
-        - AttributeName: columnID
-          KeyType: Hash
-      GlobalSecondaryIndexes:
+        TableName: ${self:custom.columnsTableName}
+        AttributeDefinitions: 
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: columnIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: columnID
+            KeyType: Hash
+        GlobalSecondaryIndexes:
           - IndexName: columnsByIndex
             KeySchema:
               - AttributeName: columnIndex
@@ -172,18 +187,18 @@ resources:
     CardsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-      TableName: ${self:custom.cardsTableName}
-      AttributeDefinitions: 
-        - AttributeName: cardID
-          AttributeType: S
-        - AttributeName: columnID
-          AttributeType: S
-        - AttributeName: cardIndex
-          AttributeType: N  
-      KeySchema:
-        - AttributeName: cardID
-          KeyType: HASH
-      GlobalSecondaryIndexes:
+        TableName: ${self:custom.cardsTableName}
+        AttributeDefinitions: 
+          - AttributeName: cardID
+            AttributeType: S
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: cardIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: cardID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
           - IndexName: cardsByColumnIdAndIndex
             KeySchema:
               - AttributeName: columnID
@@ -195,5 +210,6 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+
 
   
