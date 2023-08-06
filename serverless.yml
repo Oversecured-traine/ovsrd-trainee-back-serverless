@@ -3,7 +3,7 @@ service: task-tracker
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: Oleksandra-developer
+#  profile: Oleksandra-developer
   stage: dev
   region: ${self:custom.region} 
   environment:
