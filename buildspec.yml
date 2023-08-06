@@ -5,7 +5,7 @@ phases:
       nodejs: 18
     commands:
       - npm install -g serverless
-      - npm ci
+      - npm install
   build:
     commands:
       - sls deploy
