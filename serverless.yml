@@ -3,7 +3,7 @@ service: task-tracker
 provider:
   name: aws
   runtime: nodejs18.x
-#  profile: Oleksandra-developer
+  # profile: Oleksandra-developer
   stage: dev
   region: ${self:custom.region} 
   environment:
@@ -22,7 +22,8 @@ provider:
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
           Resource: "*"
-
+plugins:
+  - serverless-offline
 custom: 
   columnsTableName: adavydova-columns
   cardsTableName: adavydova-cards
@@ -42,7 +43,7 @@ functions:
     handler: src/controller/ColumnController.getColumn
     events:
       - http:
-          path: /columns/{columnId}
+          path: /columns/{columnID}
           method: GET          
           cors: true
 
@@ -50,7 +51,7 @@ functions:
     handler: src/controller/ColumnController.updateColumn
     events:
       - http:
-          path: /columns/{columnId}
+          path: /columns/{columnID}
           method: PUT
           cors: true
 
@@ -58,7 +59,7 @@ functions:
     handler: src/controller/ColumnController.deleteColumn
     events:
       - http:
-          path: /columns/{columnId}
+          path: /columns/{columnID}
           method: DELETE
           cors: true
 
@@ -91,7 +92,7 @@ functions:
     handler: src/controller/CardController.createCard
     events:
       - http:
-          path: /cards
+          path: /cards/{columnID}
           method: POST
           cors: true
 
@@ -99,7 +100,7 @@ functions:
     handler: src/controller/CardController.getCard
     events:
       - http:
-          path: /controller/cards/{cardId}
+          path: /controller/cards/{cardID}
           method: GET
           cors: true
 
@@ -107,7 +108,7 @@ functions:
     handler: src/controller/CardController.updateCard
     events:
       - http:
-          path: /cards/{cardId}
+          path: /cards/{cardID}
           method: PUT
           cors: true
 
@@ -115,7 +116,7 @@ functions:
     handler: src/controller/CardController.deleteCard
     events:
       - http:
-          path: /cards/{cardId}
+          path: /cards/{cardID}
           method: DELETE
           cors: true
 
@@ -131,7 +132,7 @@ functions:
     handler: src/controller/CardController.getCardsByColumnID
     events:
       - http:
-          path: /columns/{columnId}/cards
+          path: /columns/{columnID}/cards
           method: GET
           cors: true
 
@@ -147,7 +148,7 @@ functions:
     handler: src/controller/CardController.move
     events:
       - http:
-          path: /cards/{cardId}/move
+          path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
           method: POST
           cors: true
 
@@ -155,7 +156,7 @@ functions:
     handler: src/controller/CardController.getMaxCardIndex
     events:
       - http:
-          path: /columns/{columnId}/maxIndex
+          path: /columns/{columnID}/maxIndex
           method: GET
           cors: true
 
@@ -210,6 +211,4 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
-
-
   

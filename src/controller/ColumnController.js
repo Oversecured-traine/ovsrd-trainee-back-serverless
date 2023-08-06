@@ -5,6 +5,13 @@ class ColumnController {
 
     constructor() {
         this.service = new ColumnService();
+        this.createColumn = this.createColumn.bind(this);
+        this.getColumn = this.getColumn.bind(this);
+        this.updateColumn = this.updateColumn.bind(this);
+        this.deleteColumn = this.deleteColumn.bind(this);
+        this.getColumns = this.getColumns.bind(this);
+        this.getSortedColumns = this.getSortedColumns.bind(this);
+        this.getMaxColumnIndex = this.getMaxColumnIndex.bind(this);
     }
 
     async createColumn (event) {
@@ -18,7 +25,7 @@ class ColumnController {
         };
 
         try {
-            const  columnTitle  = event.pathParameters.columnTitle;
+            const columnTitle = JSON.parse(event.body).columnTitle;
             const operationResponse = await this.service.createColumn(columnTitle);
             response.body = JSON.stringify({
                 message: 'Successfully added a column.',
@@ -49,8 +56,8 @@ class ColumnController {
         };
 
         try {
-            const  columnId  = event.pathParameters.columnId;
-            const Item = await this.service.getColumn(columnId);
+            const  columnID  = event.pathParameters.columnID;
+            const Item = await this.service.getColumn(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully retrieved a column.',
                 data: (Item) ? unmarshall(Item) : {} ,
@@ -80,9 +87,9 @@ class ColumnController {
         };
 
         try {
-            const  columnId  = event.pathParameters.columnId;
-            const  columnTitle  = JSON.parse(event.body.columnTitle);
-            const operationResponse = await this.service.updateColumn(columnId, columnTitle);
+            const  columnID  = event.pathParameters.columnID;
+            const  columnTitle  = JSON.parse(event.body).columnTitle;
+            const operationResponse = await this.service.updateColumn(columnID, columnTitle);
             response.body = JSON.stringify({
                 message: 'Successfully updated a column.',
                 data: (operationResponse) ? unmarshall(operationResponse) : {} ,
@@ -112,8 +119,8 @@ class ColumnController {
         };
 
         try {
-            const  columnId  = event.pathParameters.columnId;
-            const operationResponse = await this.service.deleteColumn(columnId);
+            const  columnID  = event.pathParameters.columnID;
+            const operationResponse = await this.service.deleteColumn(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully вудуеув a column.',
                 data: (operationResponse) ? unmarshall(operationResponse) : {} ,
@@ -223,4 +230,4 @@ class ColumnController {
     }
 }
 
-module.exports = ColumnController;
+module.exports = new ColumnController();

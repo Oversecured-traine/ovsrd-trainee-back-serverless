@@ -5,6 +5,15 @@ class CardController {
 
     constructor() {
         this.service = new CardService();
+        this.createCard = this.createCard.bind(this);
+        this.getCard = this.getCard.bind(this);
+        this.updateCard = this.updateCard.bind(this);
+        this.deleteCard = this.deleteCard.bind(this);
+        this.getCards = this.getCards.bind(this);
+        this.getCardsByColumnID = this.getCardsByColumnID.bind(this);
+        this.getSortedCards = this.getSortedCards.bind(this);
+        this.move = this.move.bind(this);
+        this.getMaxCardIndex = this.getMaxCardIndex.bind(this);
     }
 
     async createCard (event) {
@@ -18,7 +27,7 @@ class CardController {
         };
 
         try {
-            const  cardTitle  = event.pathParameters.cardTitle;
+            const  cardTitle  = JSON.parse(event.body).cardTitle;
             const  columnID  = event.pathParameters.columnID;
             const operationResponse = await this.service.createCard(columnID, cardTitle);
             response.body = JSON.stringify({
@@ -50,8 +59,8 @@ class CardController {
         };
 
         try {
-            const  cardId  = event.pathParameters.cardId;
-            const Item = await this.service.getCard(cardId);
+            const  cardID  = event.pathParameters.cardID;
+            const Item = await this.service.getCard(cardID);
             response.body = JSON.stringify({
                 message: 'Successfully retrieved a card.',
                 data: (Item) ? unmarshall(Item) : {} ,
@@ -81,9 +90,9 @@ class CardController {
         };
 
         try {
-            const  cardId  = event.pathParameters.cardId;
-            const  cardTitle  = JSON.parse(event.body.cardTitle);
-            const operationResponse = await this.service.updateCard(cardId, cardTitle);
+            const  cardID  = event.pathParameters.cardID;
+            const  cardTitle  = JSON.parse(event.body).cardTitle;
+            const operationResponse = await this.service.updateCard(cardID, cardTitle);
             response.body = JSON.stringify({
                 message: 'Successfully updated a card.',
                 data: (operationResponse) ? unmarshall(operationResponse) : {} ,
@@ -113,8 +122,8 @@ class CardController {
         };
 
         try {
-            const  cardId  = event.pathParameters.cardId;
-            const operationResponse = await this.service.deleteCard(cardId);
+            const  cardID  = event.pathParameters.cardID;
+            const operationResponse = await this.service.deleteCard(cardID);
             response.body = JSON.stringify({
                 message: 'Successfully deleted a card.',
                 data: (operationResponse) ? unmarshall(operationResponse) : {} ,
@@ -291,4 +300,4 @@ class CardController {
     }
 }
 
-module.exports = CardController;
+module.exports = new CardController();
