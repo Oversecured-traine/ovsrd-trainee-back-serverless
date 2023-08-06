@@ -1,14 +1,11 @@
-                "version": "0.2",
-                "phases": {
-                    "install": {
-                        "runtime-versions": {
-                            "nodejs": 16
-                        },
-                        "commands": [
-                            "npm install -g serverless",
-                            "npm ci"
-                        ]
-                    },
-                    "build": {
-                        "commands": [
-                            "sls deploy"
+version: "0.2"
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - npm install -g serverless
+      - npm ci
+  build:
+    commands:
+      - sls deploy
