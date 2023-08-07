@@ -188,6 +188,9 @@ resources:
     CardsTable:
       Type: AWS::DynamoDB::Table
       Properties:
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         TableName: ${self:custom.cardsTableName}
         AttributeDefinitions: 
           - AttributeName: cardID
