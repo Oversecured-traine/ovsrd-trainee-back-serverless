@@ -2,17 +2,212 @@ service: task-tracker
 
 provider:
   name: aws
-  runtime: nodejs14.x
-  region: us-east-1 
-
-functions:
-  getMessage:
-    handler: getMessage.handler
-    name: get-message
-    events:
-      - http:
-          path: /
-          method: GET
-
+  runtime: nodejs18.x
+  # profile: Oleksandra-developer
+  stage: dev
+  region: ${self:custom.region} 
+  environment:
+    COLUMNS_TABLE_NAME: ${self:custom.columnsTableName}
+    CARDS_TABLE_NAME: ${self:custom.cardsTableName}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource: "*"
 plugins:
   - serverless-offline
+custom: 
+  columnsTableName: adavydova-columns
+  cardsTableName: adavydova-cards
+  region: eu-west-1
+
+functions:
+  # ColumnController methods
+  createColumn:
+    handler: src/controller/ColumnController.createColumn
+    events:
+      - http:
+          path: /columns
+          method: POST
+          cors: true
+
+  getColumn:
+    handler: src/controller/ColumnController.getColumn
+    events:
+      - http:
+          path: /columns/{columnID}
+          method: GET          
+          cors: true
+
+  updateColumn:
+    handler: src/controller/ColumnController.updateColumn
+    events:
+      - http:
+          path: /columns/{columnID}
+          method: PUT
+          cors: true
+
+  deleteColumn:
+    handler: src/controller/ColumnController.deleteColumn
+    events:
+      - http:
+          path: /columns/{columnID}
+          method: DELETE
+          cors: true
+
+  getColumns:
+    handler: src/controller/ColumnController.getColumns
+    events:
+      - http:
+          path: /columns
+          method: GET
+          cors: true
+
+  getSortedColumns:
+    handler: src/controller/ColumnController.getSortedColumns
+    events:
+      - http:
+          path: /columns/sorted
+          method: GET
+          cors: true
+
+  getMaxColumnIndex:
+    handler: src/controller/ColumnController.getMaxColumnIndex
+    events:
+      - http:
+          path: /columns/maxIndex
+          method: GET
+          cors: true
+
+  # CardController methods
+  createCard:
+    handler: src/controller/CardController.createCard
+    events:
+      - http:
+          path: /cards/{columnID}
+          method: POST
+          cors: true
+
+  getCard:
+    handler: src/controller/CardController.getCard
+    events:
+      - http:
+          path: /controller/cards/{cardID}
+          method: GET
+          cors: true
+
+  updateCard:
+    handler: src/controller/CardController.updateCard
+    events:
+      - http:
+          path: /cards/{cardID}
+          method: PUT
+          cors: true
+
+  deleteCard:
+    handler: src/controller/CardController.deleteCard
+    events:
+      - http:
+          path: /cards/{cardID}
+          method: DELETE
+          cors: true
+
+  getCards:
+    handler: src/controller/CardController.getCards
+    events:
+      - http:
+          path: /cards
+          method: GET
+          cors: true
+
+  getCardsByColumnID:
+    handler: src/controller/CardController.getCardsByColumnID
+    events:
+      - http:
+          path: /columns/{columnID}/cards
+          method: GET
+          cors: true
+
+  getSortedCards:
+    handler: src/controller/CardController.getSortedCards
+    events:
+      - http:
+          path: /cards/sorted
+          method: GET
+          cors: true
+
+  moveCard:
+    handler: src/controller/CardController.move
+    events:
+      - http:
+          path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
+          method: POST
+          cors: true
+
+  getMaxCardIndex:
+    handler: src/controller/CardController.getMaxCardIndex
+    events:
+      - http:
+          path: /columns/{columnID}/maxIndex
+          method: GET
+          cors: true
+
+resources:
+  Resources:
+    ColumnsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.columnsTableName}
+        AttributeDefinitions: 
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: columnIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: columnID
+            KeyType: Hash
+        GlobalSecondaryIndexes:
+          - IndexName: columnsByIndex
+            KeySchema:
+              - AttributeName: columnIndex
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+    CardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.cardsTableName}
+        AttributeDefinitions: 
+          - AttributeName: cardID
+            AttributeType: S
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: cardIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: cardID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: cardsByColumnIdAndIndex
+            KeySchema:
+              - AttributeName: columnID
+                KeyType: HASH
+              - AttributeName: cardIndex
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
