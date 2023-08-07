@@ -185,33 +185,33 @@ resources:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
 
-    CardsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
+CardsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: ${self:custom.cardsTableName}
+    AttributeDefinitions: 
+      - AttributeName: cardID
+        AttributeType: S
+      - AttributeName: columnID
+        AttributeType: S
+      - AttributeName: cardIndex
+        AttributeType: N  
+    KeySchema:
+      - AttributeName: cardID
+        KeyType: HASH
+    GlobalSecondaryIndexes:
+      - IndexName: cardsByColumnIdAndIndex
+        KeySchema:
+          - AttributeName: columnID
+            KeyType: HASH
+          - AttributeName: cardIndex
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.cardsTableName}
-        AttributeDefinitions: 
-          - AttributeName: cardID
-            AttributeType: S
-          - AttributeName: columnID
-            AttributeType: S
-          - AttributeName: cardIndex
-            AttributeType: N  
-        KeySchema:
-          - AttributeName: cardID
-            KeyType: HASH
-        GlobalSecondaryIndexes:
-          - IndexName: cardsByColumnIdAndIndex
-            KeySchema:
-              - AttributeName: columnID
-                KeyType: HASH
-              - AttributeName: cardIndex
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
   
