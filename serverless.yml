@@ -94,7 +94,7 @@ functions:
     handler: src/controller/CardController.createCard
     events:
       - http:
-          path: /cards/{columnID}
+          path: /cards/{columnID}/cards
           method: POST
           cors: true
 
@@ -102,7 +102,7 @@ functions:
     handler: src/controller/CardController.getCard
     events:
       - http:
-          path: /controller/cards/{cardID}
+          path: /cards/{cardID}
           method: GET
           cors: true
 
