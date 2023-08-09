@@ -90,13 +90,13 @@ functions:
           cors: true
 
   # CardController methods
-  # createCard:
-  #   handler: src/controller/CardController.createCard
-  #   events:
-  #     - http:
-  #         path: /cards/{columnID}
-  #         method: POST
-  #         cors: true
+  createCard:
+    handler: src/controller/CardController.createCard
+    events:
+      - http:
+          path: /cards/{columnID}
+          method: POST
+          cors: true
 
   getCard:
     handler: src/controller/CardController.getCard
