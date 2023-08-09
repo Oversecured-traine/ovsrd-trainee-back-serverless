@@ -44,7 +44,7 @@ functions:
     handler: src/controller/ColumnController.getColumn
     events:
       - http:
-          path: /columns/{columnID}
+          path: /columns/{columnIDVar}
           method: GET          
           cors: true
 
@@ -52,7 +52,7 @@ functions:
     handler: src/controller/ColumnController.updateColumn
     events:
       - http:
-          path: /columns/{columnID}
+          path: /columns/{columnIDVar}
           method: PUT
           cors: true
 
@@ -60,7 +60,7 @@ functions:
     handler: src/controller/ColumnController.deleteColumn
     events:
       - http:
-          path: /columns/{columnID}
+          path: /columns/{columnIDVar}
           method: DELETE
           cors: true
 
@@ -133,7 +133,7 @@ functions:
     handler: src/controller/CardController.getCardsByColumnID
     events:
       - http:
-          path: /columns/{columnID}/cards
+          path: /columns/{columnIDVar}/cards
           method: GET
           cors: true
 
@@ -149,7 +149,7 @@ functions:
     handler: src/controller/CardController.move
     events:
       - http:
-          path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
+          path: /cards/{cardID}/{columnIDVar}/{prevCardIndex}/{nextCardIndex}/move
           method: POST
           cors: true
 
@@ -157,7 +157,7 @@ functions:
     handler: src/controller/CardController.getMaxCardIndex
     events:
       - http:
-          path: /columns/{columnID}/maxIndex
+          path: /columns/{columnIDVar}/maxIndex
           method: GET
           cors: true
 
@@ -214,4 +214,3 @@ functions:
 #         ProvisionedThroughput:
 #           ReadCapacityUnits: 1
 #           WriteCapacityUnits: 1
-  

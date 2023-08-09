@@ -56,7 +56,7 @@ class ColumnController {
         };
 
         try {
-            const  columnID  = event.pathParameters.columnID;
+            const  columnID  = event.pathParameters.columnIDVar;
             const Item = await this.service.getColumn(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully retrieved a column.',
@@ -87,7 +87,7 @@ class ColumnController {
         };
 
         try {
-            const  columnID  = event.pathParameters.columnID;
+            const  columnID  = event.pathParameters.columnIDVar;
             const  columnTitle  = JSON.parse(event.body).columnTitle;
             const operationResponse = await this.service.updateColumn(columnID, columnTitle);
             response.body = JSON.stringify({
@@ -119,7 +119,7 @@ class ColumnController {
         };
 
         try {
-            const  columnID  = event.pathParameters.columnID;
+            const  columnID  = event.pathParameters.columnIDVar;
             const operationResponse = await this.service.deleteColumn(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully вудуеув a column.',

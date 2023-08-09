@@ -183,7 +183,7 @@ class CardController {
         };
 
         try {
-            const  columnID  = event.pathParameters.columnID;
+            const  columnID  = event.pathParameters.columnIDVar;
             const Items = await this.service.getCardsByColumnID(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully get cards by columnID.',
@@ -245,7 +245,7 @@ class CardController {
 
         try {
             const cardID = event.pathParameters.cardID;
-            const columnID = event.pathParameters.columnID;
+            const columnID = event.pathParameters.columnIDVar;
             const prevCardIndex = event.pathParameters.prevCardIndex;
             const nextCardIndex = event.pathParameters.nextCardIndex;
 
@@ -279,7 +279,7 @@ class CardController {
         };
 
         try {
-            const columnID = event.pathParameters.columnID;
+            const columnID = event.pathParameters.columnIDVar;
             const cardIndex = await this.service.getMaxCardIndex(columnID);
             response.body = JSON.stringify({
                 message: 'Successfully get max card index.',
