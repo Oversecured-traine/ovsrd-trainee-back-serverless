@@ -3,7 +3,7 @@ service: task-tracker
 provider:
   name: aws
   runtime: nodejs18.x
-  # profile: Oleksandra-developer
+  profile: Oleksandra-developer
   stage: dev
   region: ${self:custom.region} 
   environment:
@@ -94,7 +94,7 @@ functions:
     handler: src/controller/CardController.createCard
     events:
       - http:
-          path: /cards/{columnID}
+          path: /cards/{columnIDVar}
           method: POST
           cors: true
 

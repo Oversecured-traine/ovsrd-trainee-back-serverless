@@ -28,7 +28,7 @@ class CardController {
 
         try {
             const  cardTitle  = JSON.parse(event.body).cardTitle;
-            const  columnID  = event.pathParameters.columnID;
+            const  columnID  = event.pathParameters.columnIDVar;
             const operationResponse = await this.service.createCard(columnID, cardTitle);
             response.body = JSON.stringify({
                 message: 'Successfully added a card.',
