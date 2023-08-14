@@ -1,233 +1,185 @@
-const ColumnService = require('../service/ColumnService');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
+const middy = require('@middy/core');
+const jsonBodyParser = require('@middy/http-json-body-parser');
+const httpHeaderNormalizer = require('@middy/http-header-normalizer');
+const httpErrorHandler = require('@middy/http-error-handler');
+const errorLogger = require('@middy/error-logger'); 
+const cors = require('@middy/http-cors');
+const createError = require('http-errors');
+
+
+const ColumnService = require('../service/ColumnService');
 
 class ColumnController {
 
     constructor() {
+
         this.service = new ColumnService();
         this.createColumn = this.createColumn.bind(this);
         this.getColumn = this.getColumn.bind(this);
         this.updateColumn = this.updateColumn.bind(this);
         this.deleteColumn = this.deleteColumn.bind(this);
         this.getColumns = this.getColumns.bind(this);
-        this.getSortedColumns = this.getSortedColumns.bind(this);
         this.getMaxColumnIndex = this.getMaxColumnIndex.bind(this);
     }
 
-    async createColumn (event) {
+    async createColumn(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnTitle = event.body.columnTitle;
 
-        try {
-            const columnTitle = JSON.parse(event.body).columnTitle;
-            const operationResponse = await this.service.createColumn(columnTitle);
-            response.body = JSON.stringify({
-                message: 'Successfully added a column.',
-                data: unmarshall(operationResponse),
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to add a column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnTitle) {
+            throw createError.BadRequest('Column title is required.');
         }
 
-        return response;
+        const operationResponse = await this.service.createColumn(columnTitle);
+
+        return this.baseResponse(200, {
+            message: 'Successfully added a column.',
+            data: operationResponse,
+        });
     }
 
-    async getColumn (event) {
+    async getColumn(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnID = event.pathParameters.columnID;
 
-        try {
-            const  columnID  = event.pathParameters.columnIDVar;
-            const Item = await this.service.getColumn(columnID);
-            response.body = JSON.stringify({
-                message: 'Successfully retrieved a column.',
-                data: (Item) ? unmarshall(Item) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to retrieved a column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID) {
+            throw createError.BadRequest('Column ID is required.');
         }
 
-        return response;
+        const Item = await this.service.getColumn(columnID);
+
+        return this.baseResponse(200, {
+            message: 'Successfully retrieved a column.',
+            data: Item ? unmarshall(Item) : {},
+        });
     }
 
-    async updateColumn (event) {
+    async updateColumn(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnID = event.pathParameters.columnID;
+        const columnTitle = event.body.columnTitle;
 
-        try {
-            const  columnID  = event.pathParameters.columnIDVar;
-            const  columnTitle  = JSON.parse(event.body).columnTitle;
-            const operationResponse = await this.service.updateColumn(columnID, columnTitle);
-            response.body = JSON.stringify({
-                message: 'Successfully updated a column.',
-                data: (operationResponse) ? unmarshall(operationResponse) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to update a column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID || !columnTitle) {
+            throw createError.BadRequest('Column ID or Column tilte is missed.');
         }
+        const operationResponse = await this.service.updateColumn(columnID, columnTitle);
 
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully updated a column.',
+            data: operationResponse,
+        });
     }
 
-    async deleteColumn (event) {
+    async deleteColumn(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnID = event.pathParameters.columnID;
 
-        try {
-            const  columnID  = event.pathParameters.columnIDVar;
-            const operationResponse = await this.service.deleteColumn(columnID);
-            response.body = JSON.stringify({
-                message: 'Successfully вудуеув a column.',
-                data: (operationResponse) ? unmarshall(operationResponse) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to update a column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID) {
+            throw createError.BadRequest('Column ID is required.');
         }
+        const operationResponse = await this.service.deleteColumn(columnID);
 
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully deleted a column.',
+            data: operationResponse,
+        });
     }
 
-    async getColumns (event) {
+    async getColumns() {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const Items = await this.service.getColumns();
 
-        try {
-            const Items = await this.service.getColumns();
-            response.body = JSON.stringify({
-                message: 'Successfully get columns.',
-                data: (Items) ? unmarshall(Items) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
-        }
-
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully retrieved columns.',
+            data: Items.map((item) => unmarshall(item)),
+            rawData: Items,
+        });
     }
 
-    async getSortedColumns (event) {
+    async getMaxColumnIndex() {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnIndex = await this.service.getMaxColumnIndex();
 
-        try {
-            const Items = await this.service.getSortedColumns();
-            response.body = JSON.stringify({
-                message: 'Successfully get sorted columns.',
-                data: (Items) ? unmarshall(Items) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get sorted column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
-        }
-
-        return response;
+        return this.baseResponse(200, columnIndex > 0 ? {
+            message: 'Successfully get MaxColumnIndex.',
+            data: columnIndex,
+        } : {
+            message: 'There are no columns in the table.',
+            data: columnIndex,
+        });
     }
 
-    async getMaxColumnIndex (event) {
+    baseResponse(statusCode, data) {
 
-        const response = {
-            statusCode: 200,
+        return {
+            statusCode: statusCode,
             headers: {
-                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(data),
         };
-
-        try {
-            const columnIndex = await this.service.getMaxColumnIndex();
-            response.body = JSON.stringify({
-                message: 'Successfully get columns.',
-                data: (columnIndex) ? unmarshall(columnIndex) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get column.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
-        }
-
-        return response;
     }
 }
 
-module.exports = new ColumnController();
+const controller = new ColumnController();
+
+controller.createColumn = middy(controller.createColumn)
+    .use([
+        jsonBodyParser(),
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getColumn = middy(controller.getColumn)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.updateColumn = middy(controller.updateColumn)
+    .use([
+        jsonBodyParser(),
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.deleteColumn = middy(controller.deleteColumn)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getColumns = middy(controller.getColumns)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+module.exports = controller;
