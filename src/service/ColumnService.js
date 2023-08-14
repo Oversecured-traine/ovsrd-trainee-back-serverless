@@ -4,6 +4,7 @@ const CardService = require('../service/CardService');
 class ColumnService {
 
     constructor() {
+        
         this.repository = new ColumnRepository();
         this.cardService = new CardService();
     }
