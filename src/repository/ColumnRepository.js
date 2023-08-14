@@ -1,12 +1,13 @@
 const dynamodb = require('../common/Dynamo');
 const { GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, ScanCommand, QueryCommand } = require('@aws-sdk/client-dynamodb');
-const { marshall } = require('@aws-sdk/util-dynamodb');
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 
 class ColumnRepository {
 
     constructor() {
+        
         this.tableName = process.env.COLUMNS_TABLE_NAME;
         this.MIN_INDEX = 3000;
     }
@@ -16,6 +17,7 @@ class ColumnRepository {
         const columnID = uuidv4();
 
         const maxIndex = await this.getMaxColumnIndex();
+
         const columnIndex = maxIndex + this.MIN_INDEX;
 
         const params = {
@@ -23,7 +25,9 @@ class ColumnRepository {
             Item: marshall({ columnID, columnIndex, columnTitle }),
         };
 
-        return await dynamodb.send(new PutItemCommand(params));
+        const operationResult = await dynamodb.send(new PutItemCommand(params));
+
+        return operationResult;
 
     }
 
@@ -65,66 +69,40 @@ class ColumnRepository {
 
     }
 
-    async getColumns ()  {
-
+    async getColumns() {
         const params = {
             TableName: this.tableName,
-        };
-
-        const { Items } = await dynamodb.send(new ScanCommand(params));
-
-        return Items;
-    }
-
-    // Колонки сортируются по индексу
-    async getSortedColumns ()  {
-
-        const params = {
-            TableName: this.tableName,
-            IndexName: 'columnsByIndex',
-            KeyConditionExpression: 'columnIndex > :startValue',
-            ExpressionAttributeValues: {
-                ':startValue': marshall({ N: '0' }),
-            },
             ScanIndexForward: true,
         };
-
-        try {
-            const { Items } = await dynamodb.send(new ScanCommand(params));
-            return Items;
-        } 
-
-        catch (error) {
-            console.error('Error getting columns:', error);
-            throw new Error('Failed to get columns from the database');
-        }
-    }
     
-    async  getMaxColumnIndex () {
+        const { Items } = await dynamodb.send(new ScanCommand(params));
+    
+        // Сортируем массив по возрастанию индекса
+        // const sortedItems = Items.sort((a, b) => {
+        //     const indexA = unmarshall(a).columnIndex;
+        //     const indexB = unmarshall(b).columnIndex;
+        //     return indexA - indexB;
+        // });
+    
+        return Items;
+    }
+  
+    async getMaxColumnIndex() {
+        
         const params = {
             TableName: this.tableName,
-            ProjectionExpression: 'columnIndex', 
-            Limit: 1,
-            ScanIndexForward: false, 
-            KeyConditionExpression: 'columnID > :startValue', 
-            ExpressionAttributeValues: {
-                ':startValue': '', 
-            },
+            ProjectionExpression: 'columnIndex',
         };
-    
-        try {
-            const { Items } = await dynamodb.send(new QueryCommand(params));
-            if (Items.length > 0) {
-                return Items[0].columnIndex;
-            } else {
-                return 0;
-            }
-        } catch (error) {
-            console.error('Error getting max column index:', error);
-            throw new Error('Failed to get max column index from the database');
+      
+        const { Items } = await dynamodb.send(new ScanCommand(params));
+        
+        if (Items.length > 0) {
+            const maxIndex = Math.max(...Items.map(item => unmarshall(item).columnIndex));
+            return maxIndex;
+        } else {
+            return 0;
         }
     }
     
-
 }
 module.exports = ColumnRepository;
