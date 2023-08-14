@@ -10,6 +10,7 @@ const params = {
     TableName: 'adavydova-columns',
     KeySchema: [
         { AttributeName: 'columnID', KeyType: 'HASH' },
+        { AttributeName: 'columnIndex', KeyType: 'RANGE' },
     ],
     AttributeDefinitions: [
         { AttributeName: 'columnID', AttributeType: 'S' },
