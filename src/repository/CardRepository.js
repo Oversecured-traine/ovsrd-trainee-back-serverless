@@ -1,12 +1,13 @@
 const dynamodb = require('../common/Dynamo');
 const { GetItemCommand, PutItemCommand, UpdateItemCommand, DeleteItemCommand, ScanCommand, QueryCommand, BatchWriteItemCommand } = require('@aws-sdk/client-dynamodb');
-const { marshall } = require('@aws-sdk/util-dynamodb');
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 
 class CardRepository {
 
     constructor() {
+        
         this.tableName = process.env.CARDS_TABLE_NAME;
         this.MIN_INDEX = 3000;
     }
@@ -15,7 +16,7 @@ class CardRepository {
 
         const cardID = uuidv4();
 
-        const maxIndex  = await this.getMaxCardIndex();
+        const maxIndex  = await this.getMaxCardIndex(columnID);
         const cardIndex = maxIndex + this.MIN_INDEX;
 
         const params = {
@@ -40,14 +41,17 @@ class CardRepository {
 
     }
 
-    async updateCard (cardID, cardTitle)  {
+    async updateCard (cardID, cardTitle, cardDescription)  {
 
         const params = {
             TableName: this.tableName,
             Key: marshall({ cardID }),
-            UpdateExpression: 'SET #attr = :val',
-            ExpressionAttributeNames: { '#attr': 'cardTitle' },
-            ExpressionAttributeValues: marshall({ ':val': cardTitle }),
+            UpdateExpression: 'SET #attr = :val, #descAttr = :descVal', 
+            ExpressionAttributeNames: { '#attr': 'cardTitle', '#descAttr': 'cardDescription' },
+            ExpressionAttributeValues: marshall({
+                ':titleVal': cardTitle,
+                ':descVal': cardDescription,
+            }),
         };
 
         return await dynamodb.send(new UpdateItemCommand(params));
@@ -65,31 +69,32 @@ class CardRepository {
 
     }
 
-    async  getCardsByColumnID (columnID) {
-
+    async getCardsByColumnID(columnID) {
         const params = {
             TableName: this.tableName,
+            IndexName: 'cardsByColumnIdAndIndex',
             KeyConditionExpression: 'columnID = :columnID',
-            ExpressionAttributeValues: {
-                ':columnID': { S: columnID },
-            },
+            ExpressionAttributeValues: { ':columnID': { S: columnID } },
         };
       
         try {
             const { Items } = await dynamodb.send(new QueryCommand(params));
-            return Items;  
+            return Items;
         } 
         catch (error) {
             console.error('Error getting cards:', error);
             throw new Error('Failed to get cards from the database.');
         }
     }
+    
 
     async deleteCardsInBatch (items) {
 
         const deleteRequests = items.map((item) => ({
             DeleteRequest: {
-                Key: marshall({ columnID: { S: item.columnID.S }, cardID: { S: item.cardID.S } }),
+                Key: {
+                    cardID: { S: item.cardID.S },
+                },
             },
         }));
 
@@ -97,7 +102,7 @@ class CardRepository {
             console.log('No cards to delete.');
             return;
         }
-      
+
         const batchParams = {
             RequestItems: {
                 [this.tableName]: deleteRequests,
@@ -126,45 +131,13 @@ class CardRepository {
         return Items;
     }
 
-    // Карточки возвращаються отсортированные по айди колонки и по своему индексу
-    async getSortedCards ()  {
-
-        const params = {
-            TableName: this.tableName,
-            IndexName: 'cardsByColumnIdAndIndex',
-            KeyConditionExpression: 'cardIndex > :startValue',
-            ExpressionAttributeValues: {
-                ':startValue': marshall({ N: '0' }),
-            },
-            ScanIndexForward: true,
-        };
-    
-        try {
-            const { Items } = await dynamodb.send(new QueryCommand(params));
-            return Items;
-        } 
-    
-        catch (error) {
-            console.error('Error getting cards:', error);
-            throw new Error('Failed to get cards from the database');
-        }
-    }
-
     async move (cardID, columnID, prevCardIndex, nextCardIndex ) {
 
-        //в карточке поменять columnID на новую
-        //задать cardIndex = (prevCardIndex + nextCardIndex) / 2
+        const cardIndex = (+prevCardIndex && +nextCardIndex) ?
+            (+prevCardIndex + +nextCardIndex) / 2 :
+            (+prevCardIndex ? +prevCardIndex + +prevCardIndex / 2 :
+                +nextCardIndex ? this.MIN_INDEX - +nextCardIndex / 2 : this.MIN_INDEX);
 
-        let cardIndex = 0;
-        if(prevCardIndex && nextCardIndex) {
-            cardIndex = (prevCardIndex + nextCardIndex) / 2;
-        }
-        else if (prevCardIndex) {
-            cardIndex = prevCardIndex + (prevCardIndex / 2);
-        }
-        else if (nextCardIndex) {
-            cardIndex = nextCardIndex / 2;
-        }
 
         const params = {
             TableName: this.tableName, 
@@ -181,6 +154,7 @@ class CardRepository {
         };
         try {
             await dynamodb.send(new UpdateItemCommand(params));
+            return cardIndex;
         }
         catch (error) {
             console.error('Error moving card:', error);
@@ -194,25 +168,26 @@ class CardRepository {
             TableName: this.tableName,
             IndexName: 'cardsByColumnIdAndIndex',
             KeyConditionExpression: 'columnID = :columnID',
-            ExpressionAttributeValues: { ':columnID': columnID },
+            ExpressionAttributeValues: marshall({ ':columnID':  columnID }),
             ScanIndexForward: false,
             Limit: 1,
         };
 
         try {
             const { Items } = await dynamodb.send(new QueryCommand(params));
-            if (Items.length > 0) {
-                return Items[0].cardIndex;
+            if (Items && Items.length > 0) {
+                return unmarshall(Items[0]).cardIndex;
             }
             return 0;
         }
+        
 
         catch (error) {
             console.error('Error fetching maximum cardIndex:', error);
             throw new Error('Failed to get maximum cardIndex from the database');
         }
+    
     }
-
 }
 
 module.exports = CardRepository;
