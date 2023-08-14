@@ -1,9 +1,18 @@
-const CardService = require('../service/CardService');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
+const middy = require('@middy/core');
+const jsonBodyParser = require('@middy/http-json-body-parser');
+const httpHeaderNormalizer = require('@middy/http-header-normalizer');
+const httpErrorHandler = require('@middy/http-error-handler');
+const errorLogger = require('@middy/error-logger'); 
+const cors = require('@middy/http-cors');
+const createError = require('http-errors');
+
+const CardService = require('../service/CardService');
 
 class CardController {
 
     constructor() {
+
         this.service = new CardService();
         this.createCard = this.createCard.bind(this);
         this.getCard = this.getCard.bind(this);
@@ -11,293 +20,219 @@ class CardController {
         this.deleteCard = this.deleteCard.bind(this);
         this.getCards = this.getCards.bind(this);
         this.getCardsByColumnID = this.getCardsByColumnID.bind(this);
-        this.getSortedCards = this.getSortedCards.bind(this);
         this.move = this.move.bind(this);
         this.getMaxCardIndex = this.getMaxCardIndex.bind(this);
+
     }
 
-    async createCard (event) {
+    baseResponse(statusCode, data) {
 
-        const response = {
-            statusCode: 200,
+        return {
+            statusCode: statusCode,
             headers: {
-                'Access-Control-Allow-Origin': '*',
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify(data),
         };
-
-        try {
-            const  cardTitle  = JSON.parse(event.body).cardTitle;
-            const  columnID  = event.pathParameters.columnIDVar;
-            const operationResponse = await this.service.createCard(columnID, cardTitle);
-            response.body = JSON.stringify({
-                message: 'Successfully added a card.',
-                data: unmarshall(operationResponse),
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to add a card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
-        }
-
-        return response;
     }
 
-    async getCard (event) {
+    async createCard(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const cardTitle = event.body.cardTitle;
+        const columnID = event.pathParameters.columnID;
 
-        try {
-            const  cardID  = event.pathParameters.cardID;
-            const Item = await this.service.getCard(cardID);
-            response.body = JSON.stringify({
-                message: 'Successfully retrieved a card.',
-                data: (Item) ? unmarshall(Item) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to retrieved a card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID || !cardTitle) {
+            throw createError.BadRequest('Column ID or Card tilte is missed.');
         }
 
-        return response;
+        const operationResponse = await this.service.createCard(columnID, cardTitle);
+
+        return this.baseResponse(200, {
+            message: 'Successfully added a card.',
+            data: operationResponse,
+        });
     }
 
-    async updateCard (event) {
+    async getCard(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const cardID = event.pathParameters.cardID;
 
-        try {
-            const  cardID  = event.pathParameters.cardID;
-            const  cardTitle  = JSON.parse(event.body).cardTitle;
-            const operationResponse = await this.service.updateCard(cardID, cardTitle);
-            response.body = JSON.stringify({
-                message: 'Successfully updated a card.',
-                data: (operationResponse) ? unmarshall(operationResponse) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to update a card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!cardID) {
+            throw createError.BadRequest('Card ID is required.');
         }
+        const Item = await this.service.getCard(cardID);
 
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully retrieved a card.',
+            data: Item ? unmarshall(Item) : {},
+        });
     }
 
-    async deleteCard (event) {
+    async updateCard(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const cardID = event.pathParameters.cardID;
+        const cardTitle = event.body.cardTitle;
+        const cardDescription = event.body.cardDescription;
 
-        try {
-            const  cardID  = event.pathParameters.cardID;
-            const operationResponse = await this.service.deleteCard(cardID);
-            response.body = JSON.stringify({
-                message: 'Successfully deleted a card.',
-                data: (operationResponse) ? unmarshall(operationResponse) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to delete a card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!cardID || !cardTitle || !cardDescription) {
+            throw createError.BadRequest('Card ID or Card tilte or Card description is missed.');
         }
+        const operationResponse = await this.service.updateCard(cardID, cardTitle, cardDescription);
 
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully updated a card.',
+            data: operationResponse,
+        });
     }
 
-    async getCards (event) {
+    async deleteCard(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const cardID = event.pathParameters.cardID;
 
-        try {
-            const Items = await this.service.getCards();
-            response.body = JSON.stringify({
-                message: 'Successfully get cards.',
-                data: (Items) ? unmarshall(Items) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!cardID) {
+            throw createError.BadRequest('Card ID is required.');
         }
+        const operationResponse = await this.service.deleteCard(cardID);
 
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully deleted a card.',
+            data: operationResponse,
+        });
     }
 
-    async getCardsByColumnID (event) {
+    async getCards(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const Items = await this.service.getCards();
 
-        try {
-            const  columnID  = event.pathParameters.columnIDVar;
-            const Items = await this.service.getCardsByColumnID(columnID);
-            response.body = JSON.stringify({
-                message: 'Successfully get cards by columnID.',
-                data: (Items) ? unmarshall(Items) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get card by columnID.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
-        }
-
-        return response;
+        return this.baseResponse(200, {
+            message: 'Successfully get cards.',
+            data: Items.map((item) => unmarshall(item)),
+            rawData: Items,
+        });
     }
 
-    async getSortedCards (event) {
+    async getCardsByColumnID(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnID = event.pathParameters.columnID;
 
-        try {
-            const Items = await this.service.getSortedCards();
-            response.body = JSON.stringify({
-                message: 'Successfully get sorted cards.',
-                data: (Items) ? unmarshall(Items) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get sorted card.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID) {
+            throw createError.BadRequest('Column ID is required.');
         }
+        const Items = await this.service.getCardsByColumnID(columnID);
 
-        return response;
+        return this.baseResponse(200, Items.length > 0 ? {
+            message: 'Successfully get cards by columnID.',
+            data: Items.map((item) => unmarshall(item)),
+        } : {
+            message: 'No cards by this columnID.',
+            data: {},
+        });
     }
 
-    async move (event) {
+    async move(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const cardID = event.pathParameters.cardID;
+        const columnID = event.pathParameters.columnID;
+        const prevCardIndex = event.pathParameters.prevCardIndex;
+        const nextCardIndex = event.pathParameters.nextCardIndex;
 
-        try {
-            const cardID = event.pathParameters.cardID;
-            const columnID = event.pathParameters.columnIDVar;
-            const prevCardIndex = event.pathParameters.prevCardIndex;
-            const nextCardIndex = event.pathParameters.nextCardIndex;
-
-            const operationResponse = await this.service.move(cardID, columnID, prevCardIndex, nextCardIndex);
-            response.body = JSON.stringify({
-                message: 'Successfully get max card index.',
-                data: (operationResponse) ? unmarshall(operationResponse) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get max card index.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID || !cardID || !prevCardIndex || !nextCardIndex) {
+            throw createError.BadRequest('Some path parameter is missed.');
         }
 
-        return response;
+        const cardIndex = await this.service.move(cardID, columnID, prevCardIndex, nextCardIndex);
+
+        return this.baseResponse(200, {
+            message: 'Successfully moved card.',
+            data: { 'New card index': cardIndex },
+        });
     }
 
-    async getMaxCardIndex (event) {
+    async getMaxCardIndex(event) {
 
-        const response = {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/json',
-            },
-        };
+        const columnID = event.pathParameters.columnID;
 
-        try {
-            const columnID = event.pathParameters.columnIDVar;
-            const cardIndex = await this.service.getMaxCardIndex(columnID);
-            response.body = JSON.stringify({
-                message: 'Successfully get max card index.',
-                data: (cardIndex) ? unmarshall(cardIndex) : {} ,
-            });
-        } 
-        
-        catch (error) {
-            response.statusCode = 500;
-            response.body = JSON.stringify({
-                message: 'Failed to get max card index.',
-                errorMesagge: error.message,
-                errorStack: error.stack,
-            });
+        if (!columnID) {
+            throw createError.BadRequest('Column ID is required.');
         }
+        
+        const cardIndex = await this.service.getMaxCardIndex(columnID);
 
-        return response;
+        return this.baseResponse(200, cardIndex > 0 ? {
+            message: 'Successfully get MaxCardIndex.',
+            data: cardIndex,
+        } : {
+            message: 'There are no cards in specified column.',
+            data: cardIndex,
+        });
     }
 }
 
-module.exports = new CardController();
+const controller = new CardController();
+
+controller.createCard = middy(controller.createCard)
+    .use([
+        jsonBodyParser(),
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getCard = middy(controller.getCard)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.updateCard = middy(controller.updateCard)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.deleteCard = middy(controller.deleteCard)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getCards = middy(controller.getCards)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.move = middy(controller.move)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+controller.getMaxCardIndex = middy(controller.getMaxCardIndex)
+    .use([
+        httpHeaderNormalizer(),
+        httpErrorHandler(),
+        errorLogger(),
+        cors(),
+    ]);
+
+module.exports = controller;
