@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 AWS.config.update({
     region: 'local', 
-    endpoint: 'http://localhost:8000',
+    endpoint: 'http://localhost:8001',
 });
 
 const dynamodb = new AWS.DynamoDB();
@@ -23,6 +23,6 @@ const params = {
 };
 
 dynamodb.createTable(params, (err, data) => {
-    if (err) console.error("Ошибка при создании таблицы:", err);
-    else console.log("Таблица успешно создана:", data);
+    if (err) console.error('Ошибка при создании таблицы:', err);
+    else console.log('Таблица успешно создана:', data);
 });

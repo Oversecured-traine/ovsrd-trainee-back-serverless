@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "serverless offline start",
     "lint": "eslint ."
   },
   "devDependencies": {
@@ -21,7 +22,7 @@
     "@middy/http-event-normalizer": "^4.6.0",
     "@middy/http-header-normalizer": "^4.6.0",
     "@middy/http-json-body-parser": "^4.6.0",
-    "aws-sdk": "^2.1427.0",
+    "aws-sdk": "^2.1435.0",
     "http-errors": "^2.0.0",
     "uuid": "^9.0.0"
   }

@@ -1,4 +1,3 @@
-const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const middy = require('@middy/core');
 const jsonBodyParser = require('@middy/http-json-body-parser');
 const httpHeaderNormalizer = require('@middy/http-header-normalizer');
@@ -7,21 +6,12 @@ const errorLogger = require('@middy/error-logger');
 const cors = require('@middy/http-cors');
 const createError = require('http-errors');
 
+const baseResponse = require('../common/Response');
 
 const ColumnService = require('../service/ColumnService');
+const service = new ColumnService();
 
 class ColumnController {
-
-    constructor() {
-
-        this.service = new ColumnService();
-        this.createColumn = this.createColumn.bind(this);
-        this.getColumn = this.getColumn.bind(this);
-        this.updateColumn = this.updateColumn.bind(this);
-        this.deleteColumn = this.deleteColumn.bind(this);
-        this.getColumns = this.getColumns.bind(this);
-        this.getMaxColumnIndex = this.getMaxColumnIndex.bind(this);
-    }
 
     async createColumn(event) {
 
@@ -31,9 +21,9 @@ class ColumnController {
             throw createError.BadRequest('Column title is required.');
         }
 
-        const operationResponse = await this.service.createColumn(columnTitle);
+        const operationResponse = await service.createColumn(columnTitle);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully added a column.',
             data: operationResponse,
         });
@@ -47,11 +37,11 @@ class ColumnController {
             throw createError.BadRequest('Column ID is required.');
         }
 
-        const Item = await this.service.getColumn(columnID);
+        const Item = await service.getColumn(columnID);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully retrieved a column.',
-            data: Item ? unmarshall(Item) : {},
+            data: Item,
         });
     }
 
@@ -63,9 +53,9 @@ class ColumnController {
         if (!columnID || !columnTitle) {
             throw createError.BadRequest('Column ID or Column tilte is missed.');
         }
-        const operationResponse = await this.service.updateColumn(columnID, columnTitle);
+        const operationResponse = await service.updateColumn(columnID, columnTitle);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully updated a column.',
             data: operationResponse,
         });
@@ -78,9 +68,9 @@ class ColumnController {
         if (!columnID) {
             throw createError.BadRequest('Column ID is required.');
         }
-        const operationResponse = await this.service.deleteColumn(columnID);
+        const operationResponse = await service.deleteColumn(columnID);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully deleted a column.',
             data: operationResponse,
         });
@@ -88,20 +78,19 @@ class ColumnController {
 
     async getColumns() {
 
-        const Items = await this.service.getColumns();
+        const Items = await service.getColumns();
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully retrieved columns.',
-            data: Items.map((item) => unmarshall(item)),
-            rawData: Items,
+            data: Items,
         });
     }
 
     async getMaxColumnIndex() {
 
-        const columnIndex = await this.service.getMaxColumnIndex();
+        const columnIndex = await service.getMaxColumnIndex();
 
-        return this.baseResponse(200, columnIndex > 0 ? {
+        return baseResponse(200, columnIndex > 0 ? {
             message: 'Successfully get MaxColumnIndex.',
             data: columnIndex,
         } : {
@@ -110,16 +99,7 @@ class ColumnController {
         });
     }
 
-    baseResponse(statusCode, data) {
-
-        return {
-            statusCode: statusCode,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        };
-    }
+    
 }
 
 const controller = new ColumnController();
@@ -159,14 +139,6 @@ controller.deleteColumn = middy(controller.deleteColumn)
     ]);
 
 controller.getColumns = middy(controller.getColumns)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
-
-controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
     .use([
         httpHeaderNormalizer(),
         httpErrorHandler(),

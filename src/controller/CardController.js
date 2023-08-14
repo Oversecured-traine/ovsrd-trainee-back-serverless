@@ -1,4 +1,3 @@
-const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const middy = require('@middy/core');
 const jsonBodyParser = require('@middy/http-json-body-parser');
 const httpHeaderNormalizer = require('@middy/http-header-normalizer');
@@ -7,23 +6,14 @@ const errorLogger = require('@middy/error-logger');
 const cors = require('@middy/http-cors');
 const createError = require('http-errors');
 
+const baseResponse = require('../common/Response');
+
 const CardService = require('../service/CardService');
+const service = new CardService();
+
 
 class CardController {
 
-    constructor() {
-
-        this.service = new CardService();
-        this.createCard = this.createCard.bind(this);
-        this.getCard = this.getCard.bind(this);
-        this.updateCard = this.updateCard.bind(this);
-        this.deleteCard = this.deleteCard.bind(this);
-        this.getCards = this.getCards.bind(this);
-        this.getCardsByColumnID = this.getCardsByColumnID.bind(this);
-        this.move = this.move.bind(this);
-        this.getMaxCardIndex = this.getMaxCardIndex.bind(this);
-
-    }
 
     baseResponse(statusCode, data) {
 
@@ -45,9 +35,9 @@ class CardController {
             throw createError.BadRequest('Column ID or Card tilte is missed.');
         }
 
-        const operationResponse = await this.service.createCard(columnID, cardTitle);
+        const operationResponse = await service.createCard(columnID, cardTitle);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully added a card.',
             data: operationResponse,
         });
@@ -60,11 +50,11 @@ class CardController {
         if (!cardID) {
             throw createError.BadRequest('Card ID is required.');
         }
-        const Item = await this.service.getCard(cardID);
+        const Item = await service.getCard(cardID);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully retrieved a card.',
-            data: Item ? unmarshall(Item) : {},
+            data: Item,
         });
     }
 
@@ -77,9 +67,9 @@ class CardController {
         if (!cardID || !cardTitle || !cardDescription) {
             throw createError.BadRequest('Card ID or Card tilte or Card description is missed.');
         }
-        const operationResponse = await this.service.updateCard(cardID, cardTitle, cardDescription);
+        const operationResponse = await service.updateCard(cardID, cardTitle, cardDescription);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully updated a card.',
             data: operationResponse,
         });
@@ -92,9 +82,9 @@ class CardController {
         if (!cardID) {
             throw createError.BadRequest('Card ID is required.');
         }
-        const operationResponse = await this.service.deleteCard(cardID);
+        const operationResponse = await service.deleteCard(cardID);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully deleted a card.',
             data: operationResponse,
         });
@@ -102,12 +92,11 @@ class CardController {
 
     async getCards(event) {
 
-        const Items = await this.service.getCards();
+        const Items = await service.getCards();
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully get cards.',
-            data: Items.map((item) => unmarshall(item)),
-            rawData: Items,
+            data: Items,
         });
     }
 
@@ -118,14 +107,11 @@ class CardController {
         if (!columnID) {
             throw createError.BadRequest('Column ID is required.');
         }
-        const Items = await this.service.getCardsByColumnID(columnID);
+        const Items = await service.getCardsByColumnID(columnID);
 
-        return this.baseResponse(200, Items.length > 0 ? {
-            message: 'Successfully get cards by columnID.',
-            data: Items.map((item) => unmarshall(item)),
-        } : {
-            message: 'No cards by this columnID.',
-            data: {},
+        return baseResponse(200, {
+            message: Items.length > 0 ? 'Successfully get cards by columnID.' : 'No cards by this columnID.',
+            data: Items,
         });
     }
 
@@ -140,9 +126,9 @@ class CardController {
             throw createError.BadRequest('Some path parameter is missed.');
         }
 
-        const cardIndex = await this.service.move(cardID, columnID, prevCardIndex, nextCardIndex);
+        const cardIndex = await service.move(cardID, columnID, prevCardIndex, nextCardIndex);
 
-        return this.baseResponse(200, {
+        return baseResponse(200, {
             message: 'Successfully moved card.',
             data: { 'New card index': cardIndex },
         });
@@ -156,13 +142,10 @@ class CardController {
             throw createError.BadRequest('Column ID is required.');
         }
         
-        const cardIndex = await this.service.getMaxCardIndex(columnID);
+        const cardIndex = await service.getMaxCardIndex(columnID);
 
-        return this.baseResponse(200, cardIndex > 0 ? {
-            message: 'Successfully get MaxCardIndex.',
-            data: cardIndex,
-        } : {
-            message: 'There are no cards in specified column.',
+        return baseResponse(200, {
+            message: cardIndex !== 0 ? 'Successfully get MaxCardIndex.' : 'There are no cards in specified column.',
             data: cardIndex,
         });
     }

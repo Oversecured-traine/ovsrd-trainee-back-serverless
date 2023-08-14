@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 AWS.config.update({
     region: 'local',
-    endpoint: 'http://localhost:8000',
+    endpoint: 'http://localhost:8001',
 });
 
 const dynamodb = new AWS.DynamoDB();
@@ -25,20 +25,20 @@ const params = {
             IndexName: 'cardsByColumnIdAndIndex',
             KeySchema: [
                 { AttributeName: 'columnID', KeyType: 'HASH' },
-                { AttributeName: 'cardIndex', KeyType: 'RANGE' }
+                { AttributeName: 'cardIndex', KeyType: 'RANGE' },
             ],
             Projection: {
-                ProjectionType: 'ALL'
+                ProjectionType: 'ALL',
             },
             ProvisionedThroughput: {
                 ReadCapacityUnits: 1,
                 WriteCapacityUnits: 1,
-            }
-        }
-    ]
+            },
+        },
+    ],
 };
 
 dynamodb.createTable(params, (err, data) => {
-    if (err) console.error("Ошибка при создании таблицы:", err);
-    else console.log("Таблица успешно создана:", data);
+    if (err) console.error('Ошибка при создании таблицы:', err);
+    else console.log('Таблица успешно создана:', data);
 });

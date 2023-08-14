@@ -10,7 +10,7 @@ provider:
     CARDS_TABLE_ARN: ${env:CARDS_TABLE_ARN}
     COLUMNS_TABLE_NAME: ${env:COLUMNS_TABLE_NAME}
     CARDS_TABLE_NAME: ${env:CARDS_TABLE_NAME}
-    # DYNAMODB_ENDPOINT: http://localhost:8000
+    # DYNAMODB_ENDPOINT: http://localhost:8001
 
   iam:
     role:
@@ -24,7 +24,11 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
-          Resource: ${self:provider.environment.COLUMNS_TABLE_ARN}/*
+          Resource: 
+            ${self:provider.environment.COLUMNS_TABLE_ARN}/*
+            ${self:provider.environment.CARDS_TABLE_ARN}}/*
+
+
 
 plugins:
   - serverless-offline
@@ -36,9 +40,9 @@ functions:
   # ColumnController methods
   createColumn:
     handler: src/controller/ColumnController.createColumn
-    timeout: 15
+    # timeout: 15
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-column
@@ -48,7 +52,7 @@ functions:
   getColumn:
     handler: src/controller/ColumnController.getColumn
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-column/{columnID}
@@ -58,7 +62,7 @@ functions:
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-columns/{columnID}
@@ -68,7 +72,7 @@ functions:
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-columns/{columnID}
@@ -77,8 +81,9 @@ functions:
 
   getColumns:
     handler: src/controller/ColumnController.getColumns
+    timeout: 15
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns
@@ -88,7 +93,7 @@ functions:
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/maxIndex
@@ -99,7 +104,7 @@ functions:
   createCard:
     handler: src/controller/CardController.createCard
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-card/{columnID}
@@ -109,7 +114,7 @@ functions:
   getCard:
     handler: src/controller/CardController.getCard
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-card/{cardID}
@@ -119,7 +124,7 @@ functions:
   updateCard:
     handler: src/controller/CardController.updateCard
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-card/{cardID}
@@ -129,7 +134,7 @@ functions:
   deleteCard:
     handler: src/controller/CardController.deleteCard
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-card/{cardID}
@@ -139,7 +144,7 @@ functions:
   getCards:
     handler: src/controller/CardController.getCards
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /cards
@@ -149,7 +154,7 @@ functions:
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/{columnID}/cards
@@ -159,7 +164,7 @@ functions:
   moveCard:
     handler: src/controller/CardController.move
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
@@ -169,7 +174,7 @@ functions:
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
     # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8000
+    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/{columnID}/maxIndex
