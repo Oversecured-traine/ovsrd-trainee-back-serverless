@@ -8,8 +8,8 @@ provider:
   environment:
     COLUMNS_TABLE_ARN: ${env:COLUMNS_TABLE_ARN}
     CARDS_TABLE_ARN: ${env:CARDS_TABLE_ARN}
-    COLUMNS_TABLE_NAME: ${self:custom.columnsTableName}
-    CARDS_TABLE_NAME: ${self:custom.cardsTableName}
+    COLUMNS_TABLE_NAME: ${env:COLUMNS_TABLE_NAME}
+    CARDS_TABLE_NAME: ${env:CARDS_TABLE_NAME}
     # DYNAMODB_ENDPOINT: http://localhost:8000
 
   iam:
@@ -30,8 +30,6 @@ plugins:
   - serverless-offline
 
 custom:
-  columnsTableName: adavydova-columns
-  cardsTableName: adavydova-cards
   region: eu-west-1
 
 functions:
