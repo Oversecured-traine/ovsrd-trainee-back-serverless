@@ -3,6 +3,7 @@ const CardRepository = require('../repository/CardRepository');
 class CardService {
 
     constructor() {
+        
         this.repository = new CardRepository();
     }
 
@@ -17,9 +18,9 @@ class CardService {
 
     }
 
-    async updateCard (cardId, cardTitle) {
+    async updateCard (cardId, cardTitle, cardDescription) {
 
-        return await this.repository.updateCard(cardId, cardTitle);
+        return await this.repository.updateCard(cardId, cardTitle, cardDescription);
 
     }
 
@@ -33,7 +34,8 @@ class CardService {
         
         const Items = await this.getCardsByColumnID(columnID);
 
-        return await this.repository.deleteCardsInBatch(Items);
+
+        Items.length > 0 ? await this.repository.deleteCardsInBatch(Items) : 'No cards to delete';
 
     }
 
