@@ -26,7 +26,13 @@ provider:
             - dynamodb:BatchWriteItem
           Resource: 
           - ${self:provider.environment.COLUMNS_TABLE_ARN}
+<<<<<<< HEAD
           - ${self:provider.environment.CARDS_TABLE_ARN}
+=======
+          - ${self:provider.environment.COLUMNS_TABLE_ARN}/*
+          - ${self:provider.environment.CARDS_TABLE_ARN}
+          - ${self:provider.environment.CARDS_TABLE_ARN}/*
+>>>>>>> af8c6e89037f01dfbbb8c6ba96aa22aa4f4a3202
 
 
 
