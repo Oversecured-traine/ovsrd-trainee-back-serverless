@@ -102,7 +102,6 @@ class CardRepository {
             console.log('No cards to delete.');
             return;
         }
-
         const batchParams = {
             RequestItems: {
                 [this.tableName]: deleteRequests,

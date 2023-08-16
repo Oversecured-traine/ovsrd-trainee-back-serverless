@@ -24,6 +24,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:BatchWriteItem
+<<<<<<< HEAD
           Resource: 
           - ${self:provider.environment.COLUMNS_TABLE_ARN}
 <<<<<<< HEAD
@@ -40,66 +41,115 @@ plugins:
   - serverless-offline
 
 custom:
+=======
+          Resource: "*"
+plugins:
+  - serverless-offline
+custom: 
+  columnsTableName: adavydova-columns
+  cardsTableName: adavydova-cards
+>>>>>>> dev
   region: eu-west-1
 
 functions:
   # ColumnController methods
   createColumn:
     handler: src/controller/ColumnController.createColumn
+<<<<<<< HEAD
     # timeout: 15
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-column
+=======
+    events:
+      - http:
+          path: /columns
+>>>>>>> dev
           method: POST
           cors: true
 
   getColumn:
     handler: src/controller/ColumnController.getColumn
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-column/{columnID}
           method: GET
+=======
+    events:
+      - http:
+          path: /columns/{columnID}
+          method: GET          
+>>>>>>> dev
           cors: true
 
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-columns/{columnID}
+=======
+    events:
+      - http:
+          path: /columns/{columnID}
+>>>>>>> dev
           method: PUT
           cors: true
 
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-columns/{columnID}
+=======
+    events:
+      - http:
+          path: /columns/{columnID}
+>>>>>>> dev
           method: DELETE
           cors: true
 
   getColumns:
     handler: src/controller/ColumnController.getColumns
+<<<<<<< HEAD
     timeout: 15
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+>>>>>>> dev
     events:
       - http:
           path: /columns
           method: GET
           cors: true
 
+<<<<<<< HEAD
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+  getSortedColumns:
+    handler: src/controller/ColumnController.getSortedColumns
+    events:
+      - http:
+          path: /columns/sorted
+          method: GET
+          cors: true
+
+  getMaxColumnIndex:
+    handler: src/controller/ColumnController.getMaxColumnIndex
+>>>>>>> dev
     events:
       - http:
           path: /columns/maxIndex
@@ -109,48 +159,75 @@ functions:
   # CardController methods
   createCard:
     handler: src/controller/CardController.createCard
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-card/{columnID}
+=======
+    events:
+      - http:
+          path: /cards/{columnID}
+>>>>>>> dev
           method: POST
           cors: true
 
   getCard:
     handler: src/controller/CardController.getCard
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-card/{cardID}
+=======
+    events:
+      - http:
+          path: /controller/cards/{cardID}
+>>>>>>> dev
           method: GET
           cors: true
 
   updateCard:
     handler: src/controller/CardController.updateCard
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-card/{cardID}
+=======
+    events:
+      - http:
+          path: /cards/{cardID}
+>>>>>>> dev
           method: PUT
           cors: true
 
   deleteCard:
     handler: src/controller/CardController.deleteCard
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-card/{cardID}
+=======
+    events:
+      - http:
+          path: /cards/{cardID}
+>>>>>>> dev
           method: DELETE
           cors: true
 
   getCards:
     handler: src/controller/CardController.getCards
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+>>>>>>> dev
     events:
       - http:
           path: /cards
@@ -159,18 +236,34 @@ functions:
 
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+>>>>>>> dev
     events:
       - http:
           path: /columns/{columnID}/cards
           method: GET
           cors: true
 
+<<<<<<< HEAD
   moveCard:
     handler: src/controller/CardController.move
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+  getSortedCards:
+    handler: src/controller/CardController.getSortedCards
+    events:
+      - http:
+          path: /cards/sorted
+          method: GET
+          cors: true
+
+  moveCard:
+    handler: src/controller/CardController.move
+>>>>>>> dev
     events:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
@@ -179,12 +272,69 @@ functions:
 
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
+<<<<<<< HEAD
     # environment:
     #   DYNAMODB_ENDPOINT: http://localhost:8001
+=======
+>>>>>>> dev
     events:
       - http:
           path: /columns/{columnID}/maxIndex
           method: GET
           cors: true
 
+<<<<<<< HEAD
   
+=======
+resources:
+  Resources:
+    ColumnsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.columnsTableName}
+        AttributeDefinitions: 
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: columnIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: columnID
+            KeyType: Hash
+        GlobalSecondaryIndexes:
+          - IndexName: columnsByIndex
+            KeySchema:
+              - AttributeName: columnIndex
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+
+    CardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.cardsTableName}
+        AttributeDefinitions: 
+          - AttributeName: cardID
+            AttributeType: S
+          - AttributeName: columnID
+            AttributeType: S
+          - AttributeName: cardIndex
+            AttributeType: N  
+        KeySchema:
+          - AttributeName: cardID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: cardsByColumnIdAndIndex
+            KeySchema:
+              - AttributeName: columnID
+                KeyType: HASH
+              - AttributeName: cardIndex
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+>>>>>>> dev

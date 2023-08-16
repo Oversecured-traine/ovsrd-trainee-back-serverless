@@ -17,7 +17,6 @@ class ColumnRepository {
         const columnID = uuidv4();
 
         const maxIndex = await this.getMaxColumnIndex();
-
         const columnIndex = maxIndex + this.MIN_INDEX;
 
         const params = {

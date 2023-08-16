@@ -13,18 +13,7 @@ const service = new CardService();
 
 
 class CardController {
-
-
-    baseResponse(statusCode, data) {
-
-        return {
-            statusCode: statusCode,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        };
-    }
+    
 
     async createCard(event) {
 
