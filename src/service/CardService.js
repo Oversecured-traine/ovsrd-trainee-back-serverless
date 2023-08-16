@@ -1,8 +1,10 @@
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const CardRepository = require('../repository/CardRepository');
 
 class CardService {
 
     constructor() {
+        
         this.repository = new CardRepository();
     }
 
@@ -13,13 +15,15 @@ class CardService {
 
     async getCard (cardId) {
 
-        return await this.repository.getCard(cardId);
+        const Item =  await this.repository.getCard(cardId);
+
+        return Item ? unmarshall(Item) : {};
 
     }
 
-    async updateCard (cardId, cardTitle) {
+    async updateCard (cardId, cardTitle, cardDescription) {
 
-        return await this.repository.updateCard(cardId, cardTitle);
+        return await this.repository.updateCard(cardId, cardTitle, cardDescription);
 
     }
 
@@ -33,25 +37,25 @@ class CardService {
         
         const Items = await this.getCardsByColumnID(columnID);
 
-        return await this.repository.deleteCardsInBatch(Items);
+        Items.length > 0 ? await this.repository.deleteCardsInBatch(Items) : 'No cards to delete';
 
     }
 
     async getCards () {
 
-        return await this.repository.getCards();
+        const Items =  await this.repository.getCards();
+        const unmarshalledItems = Items.map((item) => unmarshall(item));
+
+        return unmarshalledItems;
 
     }
 
     async getCardsByColumnID (columnID) {
 
-        return await this.repository.getCardsByColumnID(columnID);
+        const Items = await this.repository.getCardsByColumnID(columnID);
+        const unmarshalledItems = Items.map((item) => unmarshall(item));
 
-    }
-
-    async getSortedCards () {
-
-        return await this.repository.getSortedCards();
+        return unmarshalledItems;
 
     }
 

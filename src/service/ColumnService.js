@@ -1,9 +1,11 @@
+const { unmarshall } = require('@aws-sdk/util-dynamodb');
 const ColumnRepository = require('../repository/ColumnRepository');
 const CardService = require('../service/CardService');
 
 class ColumnService {
 
     constructor() {
+        
         this.repository = new ColumnRepository();
         this.cardService = new CardService();
     }
@@ -15,7 +17,8 @@ class ColumnService {
 
     async getColumn (columnId) {
 
-        return await this.repository.getColumn(columnId);
+        const Item = await this.repository.getColumn(columnId);
+        return Item ? unmarshall(Item) : {};
 
     }
 
@@ -35,13 +38,10 @@ class ColumnService {
 
     async getColumns () {
 
-        return await this.repository.getColumns();
+        const Items =  await this.repository.getColumns();
+        const unmarshalledItems = Items.map((item) => unmarshall(item));
 
-    }
-
-    async getSortedColumns () {
-
-        return await this.repository.getSortedColumns();
+        return  unmarshalledItems;
 
     }
 
