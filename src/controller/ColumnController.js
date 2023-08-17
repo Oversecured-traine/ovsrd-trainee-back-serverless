@@ -21,11 +21,11 @@ class ColumnController {
             throw createError.BadRequest('Column title is required.');
         }
 
-        const operationResponse = await service.createColumn(columnTitle);
+        const column = await service.createColumn(columnTitle);
 
         return baseResponse(200, {
             message: 'Successfully added a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
@@ -37,11 +37,11 @@ class ColumnController {
             throw createError.BadRequest('Column ID is required.');
         }
 
-        const Item = await service.getColumn(columnID);
+        const column = await service.getColumn(columnID);
 
         return baseResponse(200, {
             message: 'Successfully retrieved a column.',
-            data: Item,
+            data: column,
         });
     }
 
@@ -53,11 +53,11 @@ class ColumnController {
         if (!columnID || !columnTitle) {
             throw createError.BadRequest('Column ID or Column tilte is missed.');
         }
-        const operationResponse = await service.updateColumn(columnID, columnTitle);
+        const column = await service.updateColumn(columnID, columnTitle);
 
         return baseResponse(200, {
             message: 'Successfully updated a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
@@ -68,21 +68,21 @@ class ColumnController {
         if (!columnID) {
             throw createError.BadRequest('Column ID is required.');
         }
-        const operationResponse = await service.deleteColumn(columnID);
+        const column = await service.deleteColumn(columnID);
 
         return baseResponse(200, {
             message: 'Successfully deleted a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
     async getColumns() {
 
-        const Items = await service.getColumns();
+        const columns = await service.getColumns();
 
         return baseResponse(200, {
             message: 'Successfully retrieved columns.',
-            data: Items,
+            data: columns,
         });
     }
 

@@ -24,9 +24,9 @@ class ColumnRepository {
             Item: marshall({ columnID, columnIndex, columnTitle }),
         };
 
-        const operationResult = await dynamodb.send(new PutItemCommand(params));
+        await dynamodb.send(new PutItemCommand(params));
 
-        return operationResult;
+        return { columnTitle, columnID, columnIndex };
 
     }
 
@@ -53,7 +53,9 @@ class ColumnRepository {
             ExpressionAttributeValues: marshall({ ':val': columnTitle }),
         };
 
-        return await dynamodb.send(new UpdateItemCommand(params));
+        await dynamodb.send(new UpdateItemCommand(params));
+
+        return {columnID, columnTitle};
 
     }
 
@@ -64,7 +66,9 @@ class ColumnRepository {
             Key: marshall({ columnID }),
         };
 
-        return await dynamodb.send(new DeleteItemCommand(params));
+        await dynamodb.send(new DeleteItemCommand(params))
+
+        return columnID;
 
     }
 
