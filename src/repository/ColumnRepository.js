@@ -80,14 +80,13 @@ class ColumnRepository {
     
         const { Items } = await dynamodb.send(new ScanCommand(params));
     
-        // Сортируем массив по возрастанию индекса
-        // const sortedItems = Items.sort((a, b) => {
-        //     const indexA = unmarshall(a).columnIndex;
-        //     const indexB = unmarshall(b).columnIndex;
-        //     return indexA - indexB;
-        // });
+        const sortedItems = Items.sort((a, b) => {
+            const indexA = unmarshall(a).columnIndex;
+            const indexB = unmarshall(b).columnIndex;
+            return indexA - indexB;
+        });
     
-        return Items;
+        return sortedItems;
     }
   
     async getMaxColumnIndex() {
@@ -99,12 +98,9 @@ class ColumnRepository {
       
         const { Items } = await dynamodb.send(new ScanCommand(params));
         
-        if (Items.length > 0) {
-            const maxIndex = Math.max(...Items.map(item => unmarshall(item).columnIndex));
-            return maxIndex;
-        } else {
-            return 0;
-        }
+        const maxIndex = Items.length > 0 ? Math.max(...Items.map(item => unmarshall(item).columnIndex)) : 0;
+        return maxIndex;
+        
     }
     
 }
