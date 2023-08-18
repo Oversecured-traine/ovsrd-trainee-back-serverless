@@ -49,6 +49,7 @@ functions:
           path: /create-column
           method: POST
           cors: true
+            origin: '*'
 
   getColumn:
     handler: src/controller/ColumnController.getColumn
@@ -59,6 +60,7 @@ functions:
           path: /get-column/{columnID}
           method: GET
           cors: true
+            origin: '*'
 
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
@@ -69,6 +71,7 @@ functions:
           path: /update-columns/{columnID}
           method: PUT
           cors: true
+            origin: '*'
 
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
@@ -79,7 +82,7 @@ functions:
           path: /delete-columns/{columnID}
           method: DELETE
           cors: true
-
+            origin: '*'
   getColumns:
     handler: src/controller/ColumnController.getColumns
     timeout: 15
@@ -90,7 +93,7 @@ functions:
           path: /columns
           method: GET
           cors: true
-
+            origin: '*'
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
     # environment:
@@ -100,6 +103,7 @@ functions:
           path: /columns/maxIndex
           method: GET
           cors: true
+            origin: '*'
 
   # CardController methods
   createCard:
@@ -111,6 +115,7 @@ functions:
           path: /create-card/{columnID}
           method: POST
           cors: true
+            origin: '*'
 
   getCard:
     handler: src/controller/CardController.getCard
@@ -121,6 +126,7 @@ functions:
           path: /get-card/{cardID}
           method: GET
           cors: true
+            origin: '*'
 
   updateCard:
     handler: src/controller/CardController.updateCard
@@ -131,6 +137,7 @@ functions:
           path: /update-card/{cardID}
           method: PUT
           cors: true
+            origin: '*'
 
   deleteCard:
     handler: src/controller/CardController.deleteCard
@@ -141,6 +148,7 @@ functions:
           path: /delete-card/{cardID}
           method: DELETE
           cors: true
+            origin: '*'
 
   getCards:
     handler: src/controller/CardController.getCards
@@ -151,6 +159,7 @@ functions:
           path: /cards
           method: GET
           cors: true
+            origin: '*'
 
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
@@ -161,6 +170,7 @@ functions:
           path: /columns/{columnID}/cards
           method: GET
           cors: true
+            origin: '*'
 
   moveCard:
     handler: src/controller/CardController.move
@@ -171,6 +181,7 @@ functions:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
           method: POST
           cors: true
+            origin: '*'
 
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
@@ -181,3 +192,4 @@ functions:
           path: /columns/{columnID}/maxIndex
           method: GET
           cors: true
+            origin: '*'
