@@ -34,6 +34,10 @@ class CardController {
         const cardTitle = event.body.cardTitle;
         const columnID = event.pathParameters.columnID;
 
+        console.log('BODY', event.body);
+        console.log('PATH PARAMS', event.pathParameters);
+
+
         if (!columnID || !cardTitle) {
             throw createError.BadRequest('Column ID or Card tilte is missed.');
         }
