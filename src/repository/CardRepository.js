@@ -47,13 +47,15 @@ class CardRepository {
 
     async updateCard (cardID, cardTitle, cardDescription)  {
 
+        console.log('updateCard', {cardID, cardTitle, cardDescription});
+
         const params = {
             TableName: this.tableName,
             Key: marshall({ cardID }),
             UpdateExpression: 'SET #attr = :val, #descAttr = :descVal', 
             ExpressionAttributeNames: { '#attr': 'cardTitle', '#descAttr': 'cardDescription' },
             ExpressionAttributeValues: marshall({
-                ':titleVal': cardTitle,
+                ':val': cardTitle,
                 ':descVal': cardDescription,
             }),
         };
