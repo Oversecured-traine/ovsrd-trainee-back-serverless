@@ -23,8 +23,9 @@ class CardRepository {
             TableName: this.tableName,
             Item: marshall({ cardID, columnID, cardIndex, cardTitle }),
         };
+        await dynamodb.send(new PutItemCommand(params));
 
-        return await dynamodb.send(new PutItemCommand(params));
+        return { cardID, columnID, cardIndex, cardTitle };
 
     }
 
@@ -53,8 +54,9 @@ class CardRepository {
                 ':descVal': cardDescription,
             }),
         };
+        await dynamodb.send(new UpdateItemCommand(params));
 
-        return await dynamodb.send(new UpdateItemCommand(params));
+        return { cardID, cardTitle, cardDescription };
 
     }
 
@@ -64,8 +66,9 @@ class CardRepository {
             TableName: this.tableName,
             Key: marshall({ cardID }),
         };
+        await dynamodb.send(new DeleteItemCommand(params));
 
-        return await dynamodb.send(new DeleteItemCommand(params));
+        return cardID;
 
     }
 
@@ -111,6 +114,7 @@ class CardRepository {
         try {
             await dynamodb.send(new BatchWriteItemCommand(batchParams));
             console.log('All cards deleted successfully.');
+            return items;
         } 
         
         catch (error) {
@@ -174,10 +178,7 @@ class CardRepository {
 
         try {
             const { Items } = await dynamodb.send(new QueryCommand(params));
-            if (Items && Items.length > 0) {
-                return unmarshall(Items[0]).cardIndex;
-            }
-            return 0;
+            Items && Items.length > 0 ? unmarshall(Items[0]).cardIndex : 0;
         }
         
 
