@@ -103,7 +103,7 @@ class CardRepository {
         const deleteRequests = items.map((item) => ({
             DeleteRequest: {
                 Key: {
-                    cardID: item.cardID,
+                    cardID: { S: item.cardID.S },
                 },
             },
         }));
