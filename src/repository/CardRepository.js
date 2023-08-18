@@ -98,6 +98,8 @@ class CardRepository {
 
     async deleteCardsInBatch (items) {
 
+        console.log('deleteCardsInBatch', items);
+
         const deleteRequests = items.map((item) => ({
             DeleteRequest: {
                 Key: {

@@ -30,7 +30,9 @@ class ColumnService {
 
     async deleteColumn (columnId) {
 
-        await this.cardService.deleteCardsInBatch(columnId);
+        const cardsToDelete = this.cardService.getCardsByColumnID(columnId);
+
+        await this.cardService.deleteCardsInBatch(cardsToDelete);
 
         return await this.repository.deleteColumn(columnId);
 
