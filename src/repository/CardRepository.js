@@ -19,6 +19,9 @@ class CardRepository {
         const maxIndex  = await this.getMaxCardIndex(columnID);
         const cardIndex = maxIndex + this.MIN_INDEX;
 
+        console.log('cardIndex:', cardIndex);
+        console.log('columnID:', columnID);
+
         const params = {
             TableName: this.tableName,
             Item: marshall({ cardID, columnID, cardIndex, cardTitle }),
