@@ -11,6 +11,20 @@ const baseResponse = require('../common/Response');
 const ColumnService = require('../service/ColumnService');
 const service = new ColumnService();
 
+const middyServices = [
+    jsonBodyParser(),
+    httpHeaderNormalizer(),
+    httpErrorHandler(),
+    errorLogger(),
+    cors({
+        origins: [
+            'https://d1ys6ezlk3fk60.cloudfront.net',
+            'https://d3vsj6j2m25kwy.cloudfront.net',
+            'https://d1jl1mdpr1jnx3.cloudfront.net',
+        ],
+    }),
+];
+
 class ColumnController {
 
     async createColumn(event) {
@@ -105,47 +119,26 @@ class ColumnController {
 const controller = new ColumnController();
 
 controller.createColumn = middy(controller.createColumn)
-    .use([
-        jsonBodyParser(),
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.getColumn = middy(controller.getColumn)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
+
 
 controller.updateColumn = middy(controller.updateColumn)
-    .use([
-        jsonBodyParser(),
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
+
 
 controller.deleteColumn = middy(controller.deleteColumn)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
+
 
 controller.getColumns = middy(controller.getColumns)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
+
 
 controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
+
 
 module.exports = controller;

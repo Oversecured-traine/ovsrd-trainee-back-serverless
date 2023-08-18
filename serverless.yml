@@ -36,10 +36,6 @@ plugins:
 
 custom: 
   region: eu-west-1
-  allowedOrigins:
-    - https://d1ys6ezlk3fk60.cloudfront.net
-    - https://d3vsj6j2m25kwy.cloudfront.net
-    - https://d1jl1mdpr1jnx3.cloudfront.net
 
 functions:
   # ColumnController methods
@@ -52,9 +48,7 @@ functions:
       - http:
           path: /create-column
           method: POST
-          cors: 
-            origins: ${self:custom.allowedOrigins}
-
+          cors: true
 
   getColumn:
     handler: src/controller/ColumnController.getColumn
@@ -64,8 +58,7 @@ functions:
       - http:
           path: /get-column/{columnID}
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
@@ -75,8 +68,7 @@ functions:
       - http:
           path: /update-columns/{columnID}
           method: PUT
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
@@ -86,8 +78,7 @@ functions:
       - http:
           path: /delete-columns/{columnID}
           method: DELETE
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getColumns:
     handler: src/controller/ColumnController.getColumns
@@ -98,8 +89,7 @@ functions:
       - http:
           path: /columns
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
@@ -109,8 +99,7 @@ functions:
       - http:
           path: /columns/maxIndex
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   # CardController methods
   createCard:
@@ -121,8 +110,7 @@ functions:
       - http:
           path: /create-card/{columnID}
           method: POST
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getCard:
     handler: src/controller/CardController.getCard
@@ -132,8 +120,7 @@ functions:
       - http:
           path: /get-card/{cardID}
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   updateCard:
     handler: src/controller/CardController.updateCard
@@ -143,8 +130,7 @@ functions:
       - http:
           path: /update-card/{cardID}
           method: PUT
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   deleteCard:
     handler: src/controller/CardController.deleteCard
@@ -154,8 +140,7 @@ functions:
       - http:
           path: /delete-card/{cardID}
           method: DELETE
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getCards:
     handler: src/controller/CardController.getCards
@@ -165,8 +150,7 @@ functions:
       - http:
           path: /cards
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
@@ -176,8 +160,7 @@ functions:
       - http:
           path: /columns/{columnID}/cards
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   moveCard:
     handler: src/controller/CardController.move
@@ -187,8 +170,7 @@ functions:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
           method: POST
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true
 
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
@@ -198,5 +180,4 @@ functions:
       - http:
           path: /columns/{columnID}/maxIndex
           method: GET
-          cors: 
-            origins: ${self:custom.allowedOrigins}
+          cors: true

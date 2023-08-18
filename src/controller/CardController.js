@@ -11,6 +11,19 @@ const baseResponse = require('../common/Response');
 const CardService = require('../service/CardService');
 const service = new CardService();
 
+const middyServices = [
+    jsonBodyParser(),
+    httpHeaderNormalizer(),
+    httpErrorHandler(),
+    errorLogger(),
+    cors({
+        origins: [
+            'https://d1ys6ezlk3fk60.cloudfront.net',
+            'https://d3vsj6j2m25kwy.cloudfront.net',
+            'https://d1jl1mdpr1jnx3.cloudfront.net',
+        ],
+    }),
+];
 
 class CardController {
     
@@ -143,61 +156,27 @@ class CardController {
 const controller = new CardController();
 
 controller.createCard = middy(controller.createCard)
-    .use([
-        jsonBodyParser(),
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
 
 controller.getCard = middy(controller.getCard)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.updateCard = middy(controller.updateCard)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.deleteCard = middy(controller.deleteCard)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.getCards = middy(controller.getCards)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.move = middy(controller.move)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 controller.getMaxCardIndex = middy(controller.getMaxCardIndex)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-    ]);
+    .use(middyServices);
 
 module.exports = controller;
