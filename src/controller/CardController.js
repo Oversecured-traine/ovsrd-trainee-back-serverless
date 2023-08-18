@@ -156,7 +156,6 @@ controller.getCard = middy(controller.getCard)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.updateCard = middy(controller.updateCard)
@@ -164,7 +163,6 @@ controller.updateCard = middy(controller.updateCard)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.deleteCard = middy(controller.deleteCard)
@@ -172,7 +170,6 @@ controller.deleteCard = middy(controller.deleteCard)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getCards = middy(controller.getCards)
@@ -180,7 +177,6 @@ controller.getCards = middy(controller.getCards)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
@@ -188,7 +184,6 @@ controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.move = middy(controller.move)
@@ -196,7 +191,6 @@ controller.move = middy(controller.move)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getMaxCardIndex = middy(controller.getMaxCardIndex)
@@ -204,7 +198,6 @@ controller.getMaxCardIndex = middy(controller.getMaxCardIndex)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 module.exports = controller;

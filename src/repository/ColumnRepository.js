@@ -66,13 +66,14 @@ class ColumnRepository {
             Key: marshall({ columnID }),
         };
 
-        await dynamodb.send(new DeleteItemCommand(params))
+        await dynamodb.send(new DeleteItemCommand(params));
 
         return columnID;
 
     }
 
     async getColumns() {
+        
         const params = {
             TableName: this.tableName,
             ScanIndexForward: true,

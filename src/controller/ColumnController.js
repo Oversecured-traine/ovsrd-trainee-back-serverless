@@ -110,7 +110,6 @@ controller.createColumn = middy(controller.createColumn)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getColumn = middy(controller.getColumn)
@@ -118,7 +117,6 @@ controller.getColumn = middy(controller.getColumn)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.updateColumn = middy(controller.updateColumn)
@@ -127,7 +125,6 @@ controller.updateColumn = middy(controller.updateColumn)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.deleteColumn = middy(controller.deleteColumn)
@@ -135,7 +132,6 @@ controller.deleteColumn = middy(controller.deleteColumn)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getColumns = middy(controller.getColumns)
@@ -143,7 +139,6 @@ controller.getColumns = middy(controller.getColumns)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
@@ -151,7 +146,6 @@ controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
         httpHeaderNormalizer(),
         httpErrorHandler(),
         errorLogger(),
-        cors(),
     ]);
 
 module.exports = controller;
