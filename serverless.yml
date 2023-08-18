@@ -41,14 +41,11 @@ functions:
   # ColumnController methods
   createColumn:
     handler: src/controller/ColumnController.createColumn
-    # timeout: 15
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-column
           method: POST
-          cors: true
+          cors:
             origin: '*'
 
   getColumn:
@@ -59,7 +56,7 @@ functions:
       - http:
           path: /get-column/{columnID}
           method: GET
-          cors: true
+          cors:
             origin: '*'
 
   updateColumn:
@@ -70,7 +67,7 @@ functions:
       - http:
           path: /update-columns/{columnID}
           method: PUT
-          cors: true
+          cors:
             origin: '*'
 
   deleteColumn:
@@ -81,7 +78,7 @@ functions:
       - http:
           path: /delete-columns/{columnID}
           method: DELETE
-          cors: true
+          cors:
             origin: '*'
   getColumns:
     handler: src/controller/ColumnController.getColumns
@@ -92,7 +89,7 @@ functions:
       - http:
           path: /columns
           method: GET
-          cors: true
+          cors:
             origin: '*'
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
@@ -102,7 +99,7 @@ functions:
       - http:
           path: /columns/maxIndex
           method: GET
-          cors: true
+          cors:
             origin: '*'
 
   # CardController methods
@@ -114,7 +111,7 @@ functions:
       - http:
           path: /create-card/{columnID}
           method: POST
-          cors: true
+          cors:
             origin: '*'
 
   getCard:
@@ -125,7 +122,7 @@ functions:
       - http:
           path: /get-card/{cardID}
           method: GET
-          cors: true
+          cors:
             origin: '*'
 
   updateCard:
@@ -136,7 +133,7 @@ functions:
       - http:
           path: /update-card/{cardID}
           method: PUT
-          cors: true
+          cors:
             origin: '*'
 
   deleteCard:
@@ -147,7 +144,7 @@ functions:
       - http:
           path: /delete-card/{cardID}
           method: DELETE
-          cors: true
+          cors:
             origin: '*'
 
   getCards:
@@ -158,7 +155,7 @@ functions:
       - http:
           path: /cards
           method: GET
-          cors: true
+          cors:
             origin: '*'
 
   getCardsByColumnID:
@@ -169,7 +166,7 @@ functions:
       - http:
           path: /columns/{columnID}/cards
           method: GET
-          cors: true
+          cors:
             origin: '*'
 
   moveCard:
@@ -180,7 +177,7 @@ functions:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
           method: POST
-          cors: true
+          cors:
             origin: '*'
 
   getMaxCardIndex:
@@ -191,5 +188,5 @@ functions:
       - http:
           path: /columns/{columnID}/maxIndex
           method: GET
-          cors: true
+          cors:
             origin: '*'
