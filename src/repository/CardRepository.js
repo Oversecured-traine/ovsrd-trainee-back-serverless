@@ -181,7 +181,7 @@ class CardRepository {
 
         try {
             const { Items } = await dynamodb.send(new QueryCommand(params));
-            Items && Items.length > 0 ? unmarshall(Items[0]).cardIndex : 0;
+            return Items && Items.length > 0 ? unmarshall(Items[0]).cardIndex : 0;
         }
         
 
