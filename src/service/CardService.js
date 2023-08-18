@@ -36,9 +36,8 @@ class CardService {
     async deleteCardsInBatch (columnID) {
         
         const Items = await this.getCardsByColumnID(columnID);
-        console.log(Items);
-
-        return Items.length > 0 ? await this.repository.deleteCardsInBatch(marshall(Items)) : 'No cards to delete';
+        const marshalledItems = Items.map((item) => marshall(item));
+        return Items.length > 0 ? await this.repository.deleteCardsInBatch(marshalledItems) : 'No cards to delete';
 
     }
 
