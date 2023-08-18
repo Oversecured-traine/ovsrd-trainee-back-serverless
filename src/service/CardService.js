@@ -37,7 +37,7 @@ class CardService {
         
         const Items = await this.getCardsByColumnID(columnID);
 
-        Items.length > 0 ? await this.repository.deleteCardsInBatch(Items) : 'No cards to delete';
+        return Items.length > 0 ? await this.repository.deleteCardsInBatch(Items) : 'No cards to delete';
 
     }
 
