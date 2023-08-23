@@ -143,13 +143,21 @@ class CardRepository {
 
     async move (cardID, columnID, prevCardIndex, nextCardIndex ) {
         console.log('move f in repository', {cardID, columnID, prevCardIndex, nextCardIndex});
+        let cardIndex = 0;
+        if(+prevCardIndex === 0 && +nextCardIndex === 0) {
+            cardIndex = this.MIN_INDEX;
+        }
+        else if(+prevCardIndex === 0){
+            cardIndex = +nextCardIndex / 2;
+        }
+        else if(+nextCardIndex === 0) {
+            cardIndex = +prevCardIndex + (+prevCardIndex / 2);
+        }
+        else {
+            cardIndex = (+prevCardIndex + +nextCardIndex) / 2;
+        }
 
-        const cardIndex = (+prevCardIndex && +nextCardIndex) ?
-            (+prevCardIndex + +nextCardIndex) / 2 :
-            (+prevCardIndex ? +prevCardIndex + +prevCardIndex / 2 :
-                +nextCardIndex ? this.MIN_INDEX - +nextCardIndex / 2 : this.MIN_INDEX);
-
-                console.log('cardIndex', cardIndex);
+        console.log('cardIndex', cardIndex);
 
 
         const params = {
