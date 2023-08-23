@@ -176,7 +176,7 @@ functions:
     events:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
-          method: POST
+          method: PUT
           cors:
             origin: '*'
 
