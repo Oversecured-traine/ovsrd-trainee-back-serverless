@@ -137,7 +137,7 @@ class CardController {
 
         return baseResponse(200, {
             message: 'Successfully moved card.',
-            data: { 'New card index': cardIndex },
+            data: { 'cardIndex': cardIndex },
         });
     }
 
