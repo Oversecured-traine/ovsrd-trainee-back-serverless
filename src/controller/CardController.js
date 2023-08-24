@@ -122,7 +122,7 @@ class CardController {
         });
     }
 
-    async move(event) {
+    async moveCard(event) {
 
         const cardID = event.pathParameters.cardID;
         const columnID = event.pathParameters.columnID;
@@ -133,7 +133,7 @@ class CardController {
             throw createError.BadRequest('Some path parameter is missed.');
         }
 
-        const cardIndex = await service.move(cardID, columnID, prevCardIndex, nextCardIndex);
+        const cardIndex = await service.moveCard(cardID, columnID, prevCardIndex, nextCardIndex);
 
         return baseResponse(200, {
             message: 'Successfully moved card.',
@@ -178,7 +178,7 @@ controller.getCards = middy(controller.getCards)
 controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
     .use(middyServices);
 
-controller.move = middy(controller.move)
+controller.moveCard = middy(controller.moveCard)
     .use(middyServices);
 
 controller.getMaxCardIndex = middy(controller.getMaxCardIndex)

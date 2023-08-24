@@ -59,9 +59,9 @@ class CardService {
 
     }
 
-    async move (cardID, columnID, prevCardIndex, nextCardIndex) {
+    async moveCard (cardID, columnID, prevCardIndex, nextCardIndex) {
 
-        return await this.repository.move(cardID, columnID, prevCardIndex, nextCardIndex);
+        return await this.repository.moveCard(cardID, columnID, prevCardIndex, nextCardIndex);
 
     }
 

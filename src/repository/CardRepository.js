@@ -141,7 +141,7 @@ class CardRepository {
         return Items;
     }
 
-    async move (cardID, columnID, prevCardIndex, nextCardIndex ) {
+    async moveCard (cardID, columnID, prevCardIndex, nextCardIndex ) {
         console.log('move f in repository', {cardID, columnID, prevCardIndex, nextCardIndex});
         let cardIndex = 0;
         if(+prevCardIndex === 0 && +nextCardIndex === 0) {
