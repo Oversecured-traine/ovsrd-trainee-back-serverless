@@ -24,9 +24,9 @@ class ColumnRepository {
             Item: marshall({ columnID, columnIndex, columnTitle }),
         };
 
-        const operationResult = await dynamodb.send(new PutItemCommand(params));
+        await dynamodb.send(new PutItemCommand(params));
 
-        return operationResult;
+        return { columnTitle, columnID, columnIndex };
 
     }
 
@@ -53,7 +53,9 @@ class ColumnRepository {
             ExpressionAttributeValues: marshall({ ':val': columnTitle }),
         };
 
-        return await dynamodb.send(new UpdateItemCommand(params));
+        await dynamodb.send(new UpdateItemCommand(params));
+
+        return {columnID, columnTitle};
 
     }
 
@@ -64,11 +66,14 @@ class ColumnRepository {
             Key: marshall({ columnID }),
         };
 
-        return await dynamodb.send(new DeleteItemCommand(params));
+        await dynamodb.send(new DeleteItemCommand(params));
+
+        return columnID;
 
     }
 
     async getColumns() {
+        
         const params = {
             TableName: this.tableName,
             ScanIndexForward: true,
@@ -76,14 +81,13 @@ class ColumnRepository {
     
         const { Items } = await dynamodb.send(new ScanCommand(params));
     
-        // Сортируем массив по возрастанию индекса
-        // const sortedItems = Items.sort((a, b) => {
-        //     const indexA = unmarshall(a).columnIndex;
-        //     const indexB = unmarshall(b).columnIndex;
-        //     return indexA - indexB;
-        // });
+        const sortedItems = Items.sort((a, b) => {
+            const indexA = unmarshall(a).columnIndex;
+            const indexB = unmarshall(b).columnIndex;
+            return indexA - indexB;
+        });
     
-        return Items;
+        return sortedItems;
     }
   
     async getMaxColumnIndex() {
@@ -95,11 +99,48 @@ class ColumnRepository {
       
         const { Items } = await dynamodb.send(new ScanCommand(params));
         
-        if (Items.length > 0) {
-            const maxIndex = Math.max(...Items.map(item => unmarshall(item).columnIndex));
-            return maxIndex;
-        } else {
-            return 0;
+        const maxIndex = Items.length > 0 ? Math.max(...Items.map(item => unmarshall(item).columnIndex)) : 0;
+        return maxIndex;
+        
+    }
+
+    async moveColumn(columnID, prevColumnIndex, nextColumnIndex ) {
+        console.log('move f in repository', {columnID, prevColumnIndex, nextColumnIndex});
+        let columnIndex = 0;
+        if(+prevColumnIndex === 0 && +nextColumnIndex === 0) {
+            columnIndex = this.MIN_INDEX;
+        }
+        else if(+prevColumnIndex === 0){
+            columnIndex = +nextColumnIndex / 2;
+        }
+        else if(+nextColumnIndex === 0) {
+            columnIndex = +prevColumnIndex + (+prevColumnIndex / 2);
+        }
+        else {
+            columnIndex = (+prevColumnIndex + +nextColumnIndex) / 2;
+        }
+
+        console.log('columnIndex', columnIndex);
+
+
+        const params = {
+            TableName: this.tableName, 
+            Key: marshall({ columnID }),
+            UpdateExpression: 'SET #indAttr = :indVal',
+            ExpressionAttributeNames: {
+                '#indAttr': 'columnIndex',
+            },
+            ExpressionAttributeValues: marshall({
+                ':indVal': columnIndex,
+            }),
+        };
+        try {
+            await dynamodb.send(new UpdateItemCommand(params));
+            return columnIndex;
+        }
+        catch (error) {
+            console.error('Error moving column:', error);
+            throw new Error('Failed to move a column.');
         }
     }
     

@@ -1,4 +1,4 @@
-const { unmarshall } = require('@aws-sdk/util-dynamodb');
+const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 const CardRepository = require('../repository/CardRepository');
 
 class CardService {
@@ -36,8 +36,8 @@ class CardService {
     async deleteCardsInBatch (columnID) {
         
         const Items = await this.getCardsByColumnID(columnID);
-
-        Items.length > 0 ? await this.repository.deleteCardsInBatch(Items) : 'No cards to delete';
+        const marshalledItems = Items.map((item) => marshall(item));
+        return Items.length > 0 ? await this.repository.deleteCardsInBatch(marshalledItems) : 'No cards to delete';
 
     }
 
@@ -59,9 +59,9 @@ class CardService {
 
     }
 
-    async move (cardID, columnID, prevCardIndex, nextCardIndex) {
+    async moveCard (cardID, columnID, prevCardIndex, nextCardIndex) {
 
-        return await this.repository.move(cardID, columnID, prevCardIndex, nextCardIndex);
+        return await this.repository.moveCard(cardID, columnID, prevCardIndex, nextCardIndex);
 
     }
 

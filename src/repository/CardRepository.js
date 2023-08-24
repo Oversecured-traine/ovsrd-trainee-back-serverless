@@ -19,12 +19,16 @@ class CardRepository {
         const maxIndex  = await this.getMaxCardIndex(columnID);
         const cardIndex = maxIndex + this.MIN_INDEX;
 
+        console.log('cardIndex:', cardIndex);
+        console.log('columnID:', columnID);
+
         const params = {
             TableName: this.tableName,
             Item: marshall({ cardID, columnID, cardIndex, cardTitle }),
         };
+        await dynamodb.send(new PutItemCommand(params));
 
-        return await dynamodb.send(new PutItemCommand(params));
+        return { cardID, columnID, cardIndex, cardTitle };
 
     }
 
@@ -43,18 +47,21 @@ class CardRepository {
 
     async updateCard (cardID, cardTitle, cardDescription)  {
 
+        console.log('updateCard', {cardID, cardTitle, cardDescription});
+
         const params = {
             TableName: this.tableName,
             Key: marshall({ cardID }),
             UpdateExpression: 'SET #attr = :val, #descAttr = :descVal', 
             ExpressionAttributeNames: { '#attr': 'cardTitle', '#descAttr': 'cardDescription' },
             ExpressionAttributeValues: marshall({
-                ':titleVal': cardTitle,
+                ':val': cardTitle,
                 ':descVal': cardDescription,
             }),
         };
+        await dynamodb.send(new UpdateItemCommand(params));
 
-        return await dynamodb.send(new UpdateItemCommand(params));
+        return { cardID, cardTitle, cardDescription };
 
     }
 
@@ -64,8 +71,9 @@ class CardRepository {
             TableName: this.tableName,
             Key: marshall({ cardID }),
         };
+        await dynamodb.send(new DeleteItemCommand(params));
 
-        return await dynamodb.send(new DeleteItemCommand(params));
+        return cardID;
 
     }
 
@@ -90,6 +98,8 @@ class CardRepository {
 
     async deleteCardsInBatch (items) {
 
+        console.log('deleteCardsInBatch', items);
+
         const deleteRequests = items.map((item) => ({
             DeleteRequest: {
                 Key: {
@@ -111,6 +121,7 @@ class CardRepository {
         try {
             await dynamodb.send(new BatchWriteItemCommand(batchParams));
             console.log('All cards deleted successfully.');
+            return items;
         } 
         
         catch (error) {
@@ -130,12 +141,23 @@ class CardRepository {
         return Items;
     }
 
-    async move (cardID, columnID, prevCardIndex, nextCardIndex ) {
+    async moveCard (cardID, columnID, prevCardIndex, nextCardIndex ) {
+        console.log('move f in repository', {cardID, columnID, prevCardIndex, nextCardIndex});
+        let cardIndex = 0;
+        if(+prevCardIndex === 0 && +nextCardIndex === 0) {
+            cardIndex = this.MIN_INDEX;
+        }
+        else if(+prevCardIndex === 0){
+            cardIndex = +nextCardIndex / 2;
+        }
+        else if(+nextCardIndex === 0) {
+            cardIndex = +prevCardIndex + (+prevCardIndex / 2);
+        }
+        else {
+            cardIndex = (+prevCardIndex + +nextCardIndex) / 2;
+        }
 
-        const cardIndex = (+prevCardIndex && +nextCardIndex) ?
-            (+prevCardIndex + +nextCardIndex) / 2 :
-            (+prevCardIndex ? +prevCardIndex + +prevCardIndex / 2 :
-                +nextCardIndex ? this.MIN_INDEX - +nextCardIndex / 2 : this.MIN_INDEX);
+        console.log('cardIndex', cardIndex);
 
 
         const params = {
@@ -174,10 +196,7 @@ class CardRepository {
 
         try {
             const { Items } = await dynamodb.send(new QueryCommand(params));
-            if (Items && Items.length > 0) {
-                return unmarshall(Items[0]).cardIndex;
-            }
-            return 0;
+            return Items && Items.length > 0 ? unmarshall(Items[0]).cardIndex : 0;
         }
         
 

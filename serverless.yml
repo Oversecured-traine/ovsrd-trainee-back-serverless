@@ -41,143 +41,124 @@ functions:
   # ColumnController methods
   createColumn:
     handler: src/controller/ColumnController.createColumn
-    # timeout: 15
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-column
           method: POST
-          cors: true
-
+          cors:
+            origin: '*'
   getColumn:
     handler: src/controller/ColumnController.getColumn
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-column/{columnID}
           method: GET
-          cors: true
-
+          cors:
+            origin: '*'
   updateColumn:
     handler: src/controller/ColumnController.updateColumn
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-columns/{columnID}
           method: PUT
-          cors: true
-
+          cors:
+            origin: '*'
   deleteColumn:
     handler: src/controller/ColumnController.deleteColumn
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-columns/{columnID}
           method: DELETE
-          cors: true
-
+          cors:
+            origin: '*'
   getColumns:
     handler: src/controller/ColumnController.getColumns
     timeout: 15
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns
           method: GET
-          cors: true
-
+          cors:
+            origin: '*'
   getMaxColumnIndex:
     handler: src/controller/ColumnController.getMaxColumnIndex
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/maxIndex
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+  moveColumn:
+    handler: src/controller/ColumnController.moveColumn
+    events:
+      - http:
+          path: /columns/{columnID}/{prevColumnIndex}/{nextColumnIndex}/move
+          method: PUT
+          cors:
+            origin: '*'
 
   # CardController methods
   createCard:
     handler: src/controller/CardController.createCard
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /create-card/{columnID}
           method: POST
-          cors: true
-
+          cors:
+            origin: '*'
   getCard:
     handler: src/controller/CardController.getCard
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /get-card/{cardID}
           method: GET
-          cors: true
-
+          cors:
+            origin: '*'
   updateCard:
     handler: src/controller/CardController.updateCard
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /update-card/{cardID}
           method: PUT
-          cors: true
-
+          cors:
+            origin: '*'
   deleteCard:
     handler: src/controller/CardController.deleteCard
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /delete-card/{cardID}
           method: DELETE
-          cors: true
-
+          cors:
+            origin: '*'
   getCards:
     handler: src/controller/CardController.getCards
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /cards
           method: GET
-          cors: true
-
+          cors:
+            origin: '*'
   getCardsByColumnID:
     handler: src/controller/CardController.getCardsByColumnID
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/{columnID}/cards
           method: GET
-          cors: true
-
+          cors:
+            origin: '*'
   moveCard:
-    handler: src/controller/CardController.move
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
+    handler: src/controller/CardController.moveCard
     events:
       - http:
           path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
-          method: POST
-          cors: true
-
+          method: PUT
+          cors:
+            origin: '*'
   getMaxCardIndex:
     handler: src/controller/CardController.getMaxCardIndex
-    # environment:
-    #   DYNAMODB_ENDPOINT: http://localhost:8001
     events:
       - http:
           path: /columns/{columnID}/maxIndex
           method: GET
-          cors: true
+          cors:
+            origin: '*'

@@ -50,6 +50,12 @@ class ColumnService {
         return await this.repository.getMaxColumnIndex();
     }
 
+    async moveColumn (columnID, prevColumnIndex, nextColumnIndex) {
+
+        return await this.repository.moveColumn(columnID, prevColumnIndex, nextColumnIndex);
+
+    }
+
 }
 
 module.exports = ColumnService;

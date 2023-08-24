@@ -11,6 +11,21 @@ const baseResponse = require('../common/Response');
 const ColumnService = require('../service/ColumnService');
 const service = new ColumnService();
 
+const middyServices = [
+    jsonBodyParser(),
+    httpHeaderNormalizer(),
+    httpErrorHandler(),
+    errorLogger(),
+    cors(),
+    // cors({
+    //     origins: [
+    //         'https://d1ys6ezlk3fk60.cloudfront.net',
+    //         'https://d3vsj6j2m25kwy.cloudfront.net',
+    //         'https://d1jl1mdpr1jnx3.cloudfront.net',
+    //     ],
+    // }),
+];
+
 class ColumnController {
 
     async createColumn(event) {
@@ -21,11 +36,11 @@ class ColumnController {
             throw createError.BadRequest('Column title is required.');
         }
 
-        const operationResponse = await service.createColumn(columnTitle);
+        const column = await service.createColumn(columnTitle);
 
         return baseResponse(200, {
             message: 'Successfully added a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
@@ -37,11 +52,11 @@ class ColumnController {
             throw createError.BadRequest('Column ID is required.');
         }
 
-        const Item = await service.getColumn(columnID);
+        const column = await service.getColumn(columnID);
 
         return baseResponse(200, {
             message: 'Successfully retrieved a column.',
-            data: Item,
+            data: column,
         });
     }
 
@@ -53,11 +68,11 @@ class ColumnController {
         if (!columnID || !columnTitle) {
             throw createError.BadRequest('Column ID or Column tilte is missed.');
         }
-        const operationResponse = await service.updateColumn(columnID, columnTitle);
+        const column = await service.updateColumn(columnID, columnTitle);
 
         return baseResponse(200, {
             message: 'Successfully updated a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
@@ -68,21 +83,21 @@ class ColumnController {
         if (!columnID) {
             throw createError.BadRequest('Column ID is required.');
         }
-        const operationResponse = await service.deleteColumn(columnID);
+        const column = await service.deleteColumn(columnID);
 
         return baseResponse(200, {
             message: 'Successfully deleted a column.',
-            data: operationResponse,
+            data: column,
         });
     }
 
     async getColumns() {
 
-        const Items = await service.getColumns();
+        const columns = await service.getColumns();
 
         return baseResponse(200, {
             message: 'Successfully retrieved columns.',
-            data: Items,
+            data: columns,
         });
     }
 
@@ -99,59 +114,53 @@ class ColumnController {
         });
     }
 
+    async moveColumn(event) {
+
+        const columnID = event.pathParameters.columnID;
+        const prevColumnIndex = event.pathParameters.prevColumnIndex;
+        const nextColumnIndex = event.pathParameters.nextColumnIndex;
+
+        if (!columnID || !prevColumnIndex || !nextColumnIndex) {
+            throw createError.BadRequest('Some path parameter is missed.');
+        }
+
+        const columnIndex = await service.moveColumn(columnID, prevColumnIndex, nextColumnIndex);
+
+        return baseResponse(200, {
+            message: 'Successfully moved a column.',
+            data: { 'columnIndex': columnIndex },
+        });
+    }
+
     
 }
 
 const controller = new ColumnController();
 
 controller.createColumn = middy(controller.createColumn)
-    .use([
-        jsonBodyParser(),
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
 
 controller.getColumn = middy(controller.getColumn)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
+
 
 controller.updateColumn = middy(controller.updateColumn)
-    .use([
-        jsonBodyParser(),
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
+
 
 controller.deleteColumn = middy(controller.deleteColumn)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
+
 
 controller.getColumns = middy(controller.getColumns)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
+
 
 controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
-    .use([
-        httpHeaderNormalizer(),
-        httpErrorHandler(),
-        errorLogger(),
-        cors(),
-    ]);
+    .use(middyServices);
+
+controller.moveColumn = middy(controller.moveColumn)
+    .use(middyServices);
+
 
 module.exports = controller;
