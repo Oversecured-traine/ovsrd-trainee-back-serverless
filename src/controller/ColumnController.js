@@ -114,6 +114,24 @@ class ColumnController {
         });
     }
 
+    async moveColumn(event) {
+
+        const columnID = event.pathParameters.columnID;
+        const prevColumnIndex = event.pathParameters.prevColumnIndex;
+        const nextColumnIndex = event.pathParameters.nextColumnIndex;
+
+        if (!columnID || !prevColumnIndex || !nextColumnIndex) {
+            throw createError.BadRequest('Some path parameter is missed.');
+        }
+
+        const columnIndex = await service.moveColumn(columnID, prevColumnIndex, nextColumnIndex);
+
+        return baseResponse(200, {
+            message: 'Successfully moved a column.',
+            data: { 'columnIndex': columnIndex },
+        });
+    }
+
     
 }
 
@@ -139,6 +157,9 @@ controller.getColumns = middy(controller.getColumns)
 
 
 controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
+    .use(middyServices);
+
+controller.moveColumn = middy(controller.moveColumn)
     .use(middyServices);
 
 

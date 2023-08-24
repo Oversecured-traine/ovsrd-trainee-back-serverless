@@ -103,6 +103,48 @@ class ColumnRepository {
         return maxIndex;
         
     }
+
+    async moveColumn(columnID, prevColumnIndex, nextColumnIndex ) {
+        console.log('move f in repository', {columnID, prevColumnIndex, nextColumnIndex});
+        let columnIndex = 0;
+        if(+prevColumnIndex === 0 && +nextColumnIndex === 0) {
+            columnIndex = this.MIN_INDEX;
+        }
+        else if(+prevColumnIndex === 0){
+            columnIndex = +nextColumnIndex / 2;
+        }
+        else if(+nextColumnIndex === 0) {
+            columnIndex = +prevColumnIndex + (+prevColumnIndex / 2);
+        }
+        else {
+            columnIndex = (+prevColumnIndex + +nextColumnIndex) / 2;
+        }
+
+        console.log('columnIndex', columnIndex);
+
+
+        const params = {
+            TableName: this.tableName, 
+            Key: marshall({ columnID }),
+            UpdateExpression: 'SET #colAttr = :colVal, #indAttr = :indVal',
+            ExpressionAttributeNames: {
+                '#colAttr': 'columnID',
+                '#indAttr': 'columnIndex',
+            },
+            ExpressionAttributeValues: marshall({
+                ':colVal': columnID,
+                ':indVal': columnIndex,
+            }),
+        };
+        try {
+            await dynamodb.send(new UpdateItemCommand(params));
+            return columnIndex;
+        }
+        catch (error) {
+            console.error('Error moving column:', error);
+            throw new Error('Failed to move a column.');
+        }
+    }
     
 }
 module.exports = ColumnRepository;
