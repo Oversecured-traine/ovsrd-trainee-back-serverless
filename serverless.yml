@@ -88,7 +88,7 @@ functions:
           method: GET
           cors:
             origin: '*'
-    moveColumn:
+  moveColumn:
     handler: src/controller/ColumnController.moveColumn
     events:
       - http:
