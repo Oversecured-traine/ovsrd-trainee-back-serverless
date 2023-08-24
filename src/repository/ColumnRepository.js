@@ -126,13 +126,11 @@ class ColumnRepository {
         const params = {
             TableName: this.tableName, 
             Key: marshall({ columnID }),
-            UpdateExpression: 'SET #colAttr = :colVal, #indAttr = :indVal',
+            UpdateExpression: 'SET #indAttr = :indVal',
             ExpressionAttributeNames: {
-                '#colAttr': 'columnID',
                 '#indAttr': 'columnIndex',
             },
             ExpressionAttributeValues: marshall({
-                ':colVal': columnID,
                 ':indVal': columnIndex,
             }),
         };
