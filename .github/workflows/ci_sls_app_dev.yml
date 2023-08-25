@@ -1,4 +1,4 @@
-name: CI for Serverless App
+name: CI for Serverless App Dev
 
 on:
   push:
