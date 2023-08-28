@@ -17,26 +17,14 @@ const middyServices = [
     httpErrorHandler(),
     errorLogger(),
     cors(),
-    // cors({
-    //     origins: [
-    //         'https://d1ys6ezlk3fk60.cloudfront.net',
-    //         'https://d3vsj6j2m25kwy.cloudfront.net',
-    //         'https://d1jl1mdpr1jnx3.cloudfront.net',
-    //     ],
-    // }),
 ];
 
 class CardController {
     
 
     async createCard(event) {
-
         const cardTitle = event.body.cardTitle;
         const columnID = event.pathParameters.columnID;
-
-        console.log('BODY', event.body);
-        console.log('PATH PARAMS', event.pathParameters);
-
 
         if (!columnID || !cardTitle) {
             throw createError.BadRequest('Column ID or Card tilte is missed.');
