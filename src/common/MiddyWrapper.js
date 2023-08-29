@@ -18,8 +18,8 @@ const applyMiddlewares  = (handler) => {
 };
 
 const applyMiddlewaresToAllMethods = (controller) => {
-    for (const method in controller) {
-        if (typeof controller[method] === 'function') {
+    for (const method in Object.getOwnPropertyNames(Object.getPrototypeOf(controller))) {
+        if (typeof controller[method] === 'function' && method !== 'constructor') {
             controller[method] = applyMiddlewares(controller[method]);
         }
     }
