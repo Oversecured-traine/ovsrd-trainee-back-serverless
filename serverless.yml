@@ -10,7 +10,6 @@ provider:
     CARDS_TABLE_ARN: ${env:CARDS_TABLE_ARN}
     COLUMNS_TABLE_NAME: ${env:COLUMNS_TABLE_NAME}
     CARDS_TABLE_NAME: ${env:CARDS_TABLE_NAME}
-    # DYNAMODB_ENDPOINT: http://localhost:8001
 
   iam:
     role:
