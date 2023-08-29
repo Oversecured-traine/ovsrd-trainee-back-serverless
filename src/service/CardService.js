@@ -13,23 +13,23 @@ class CardService {
         return await this.repository.createCard(columnID, cardTitle);
     }
 
-    async getCard (cardId) {
+    async getCard (cardID) {
 
-        const Item =  await this.repository.getCard(cardId);
+        const Item =  await this.repository.getCard(cardID);
 
         return Item ? unmarshall(Item) : {};
 
     }
 
-    async updateCard (cardId, cardTitle, cardDescription) {
+    async updateCard (cardID, cardTitle, cardDescription) {
 
-        return await this.repository.updateCard(cardId, cardTitle, cardDescription);
+        return await this.repository.updateCard(cardID, cardTitle, cardDescription);
 
     }
 
-    async deleteCard (cardId) {
+    async deleteCard (cardID) {
 
-        return await this.repository.deleteCard(cardId);
+        return await this.repository.deleteCard(cardID);
 
     }
 
