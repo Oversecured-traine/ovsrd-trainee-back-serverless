@@ -2,7 +2,7 @@ const lambdaTester = require('lambda-tester');
 const sinon = require('sinon');
 const { marshall } = require('@aws-sdk/util-dynamodb');
 const createError = require('http-errors');
-const ColumnService = require('../../../src/service/ColumnService');
+const CardService = require('../../../src/service/CardService');
 const ColumnRepository = require('../../../src/repository/ColumnRepository');
 const columnController = require('../../../src/controller/ColumnController');
 const { describe, it } = require('mocha');
@@ -13,7 +13,7 @@ describe('ColumnController', () => {
     it('should create a column', async () => {
         const event = {
             httpMethod: 'POST',
-            body: JSON.stringify({ columnTitle: 'Test Column Title' }),
+            body: { columnTitle: 'Test Column Title' },
             headers: { 'Content-Type': 'application/json' },
         };
 
@@ -109,7 +109,7 @@ describe('ColumnController', () => {
         const event = {
             httpMethod: 'PUT',
             pathParameters: { columnID: 'test123' },
-            body: JSON.stringify({ columnTitle: 'Updated Column Title' }),
+            body: { columnTitle: 'Updated Column Title' },
             headers: { 'Content-Type': 'application/json' },
         };
 
@@ -172,6 +172,16 @@ describe('ColumnController', () => {
                 columnID: 'test',
             });
 
+        const deleteCardsInBatchStub = sinon
+            .stub(CardService.prototype, 'deleteCardsInBatch')
+            .resolves([
+                {
+                    cardID: '123',
+                    columnID: 'test',
+                    cardTitle: 'test1',
+                }, 
+            ]);
+
         await lambdaTester(columnController.deleteColumn)
             .event(event)
             .expectResult((result) => {
@@ -183,7 +193,9 @@ describe('ColumnController', () => {
                 expect(responseBody.data).to.exist;
 
                 sinon.assert.calledOnceWithExactly(deleteColumnStub, 'test');
+                sinon.assert.calledOnceWithExactly(deleteCardsInBatchStub, 'test');
                 deleteColumnStub.restore();
+                deleteCardsInBatchStub.restore();
             });
     });
     it('should throw an error', async () => {

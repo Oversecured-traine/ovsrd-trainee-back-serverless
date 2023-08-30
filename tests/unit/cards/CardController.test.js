@@ -3,7 +3,6 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const { marshall } = require('@aws-sdk/util-dynamodb');
 const createError = require('http-errors');
-const CardService = require('../../../src/service/CardService');
 const CardRepository = require('../../../src/repository/CardRepository');
 const cardController = require('../../../src/controller/CardController');
 const { describe, it } = require('mocha');
@@ -14,7 +13,7 @@ describe('CardController', () => {
     it('should create a card', async () => {
         const event = {
             httpMethod: 'POST',
-            body: JSON.stringify({ cardTitle: 'Test Card Title' }),
+            body: { cardTitle: 'Test Card Title' },
             pathParameters: { columnID: 'test' },
             headers: { 'Content-Type': 'application/json' },
         };
@@ -127,7 +126,7 @@ describe('CardController', () => {
         const event = {
             httpMethod: 'PUT',
             pathParameters: { cardID: 'test123' },
-            body: JSON.stringify({ cardTitle: 'Test Card', cardDescription: 'Test description' }),
+            body: { cardTitle: 'Test Card', cardDescription: 'Test description' },
             headers: { 'Content-Type': 'application/json' },
             rawHeaders: { 'Content-Type': 'application/json' },
 
