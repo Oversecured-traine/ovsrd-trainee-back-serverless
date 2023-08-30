@@ -1,23 +1,8 @@
-const middy = require('@middy/core');
-const jsonBodyParser = require('@middy/http-json-body-parser');
-const httpHeaderNormalizer = require('@middy/http-header-normalizer');
-const httpErrorHandler = require('@middy/http-error-handler');
-const errorLogger = require('@middy/error-logger'); 
-const cors = require('@middy/http-cors');
 const createError = require('http-errors');
-
+const applyMiddlewaresToAllMethods = require('../common/MiddyWrapper');
 const baseResponse = require('../common/Response');
-
 const ColumnService = require('../service/ColumnService');
 const service = new ColumnService();
-
-const middyServices = [
-    jsonBodyParser(),
-    httpHeaderNormalizer(),
-    httpErrorHandler(),
-    errorLogger(),
-    cors(),
-];
 
 class ColumnController {
 
@@ -130,30 +115,6 @@ class ColumnController {
 
 const controller = new ColumnController();
 
-controller.createColumn = middy(controller.createColumn)
-    .use(middyServices);
-
-controller.getColumn = middy(controller.getColumn)
-    .use(middyServices);
-
-
-controller.updateColumn = middy(controller.updateColumn)
-    .use(middyServices);
-
-
-controller.deleteColumn = middy(controller.deleteColumn)
-    .use(middyServices);
-
-
-controller.getColumns = middy(controller.getColumns)
-    .use(middyServices);
-
-
-controller.getMaxColumnIndex = middy(controller.getMaxColumnIndex)
-    .use(middyServices);
-
-controller.moveColumn = middy(controller.moveColumn)
-    .use(middyServices);
-
+applyMiddlewaresToAllMethods(controller);
 
 module.exports = controller;

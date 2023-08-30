@@ -1,27 +1,11 @@
-const middy = require('@middy/core');
-const jsonBodyParser = require('@middy/http-json-body-parser');
-const httpHeaderNormalizer = require('@middy/http-header-normalizer');
-const httpErrorHandler = require('@middy/http-error-handler');
-const errorLogger = require('@middy/error-logger'); 
-const cors = require('@middy/http-cors');
 const createError = require('http-errors');
-
 const baseResponse = require('../common/Response');
-
+const applyMiddlewaresToAllMethods = require('../common/MiddyWrapper');
 const CardService = require('../service/CardService');
 const service = new CardService();
 
-const middyServices = [
-    jsonBodyParser(),
-    httpHeaderNormalizer(),
-    httpErrorHandler(),
-    errorLogger(),
-    cors(),
-];
-
 class CardController {
     
-
     async createCard(event) {
         const cardTitle = event.body.cardTitle;
         const columnID = event.pathParameters.columnID;
@@ -148,28 +132,6 @@ class CardController {
 
 const controller = new CardController();
 
-controller.createCard = middy(controller.createCard)
-    .use(middyServices);
-
-controller.getCard = middy(controller.getCard)
-    .use(middyServices);
-
-controller.updateCard = middy(controller.updateCard)
-    .use(middyServices);
-
-controller.deleteCard = middy(controller.deleteCard)
-    .use(middyServices);
-
-controller.getCards = middy(controller.getCards)
-    .use(middyServices);
-
-controller.getCardsByColumnID = middy(controller.getCardsByColumnID)
-    .use(middyServices);
-
-controller.moveCard = middy(controller.moveCard)
-    .use(middyServices);
-
-controller.getMaxCardIndex = middy(controller.getMaxCardIndex)
-    .use(middyServices);
+applyMiddlewaresToAllMethods(controller);
 
 module.exports = controller;
