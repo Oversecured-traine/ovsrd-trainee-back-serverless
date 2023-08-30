@@ -3,13 +3,14 @@ const jsonBodyParser = require('@middy/http-json-body-parser');
 const httpHeaderNormalizer = require('@middy/http-header-normalizer');
 const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger'); 
-
+const httpCors = require('@middy/http-cors');
 
 const middyServices = [
     jsonBodyParser(),
     httpHeaderNormalizer(),
     httpErrorHandler(),
     errorLogger(),
+    httpCors(),
 ];
 
 const applyMiddlewares  = (handler) => {
