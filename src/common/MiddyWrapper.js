@@ -25,4 +25,4 @@ const applyMiddlewaresToAllMethods = (controller) => {
     }
 };
 
-module.exports = { applyMiddlewares, applyMiddlewaresToAllMethods  };
+module.exports = applyMiddlewaresToAllMethods;
