@@ -13,7 +13,7 @@ describe('ColumnController', () => {
     it('should create a column', async () => {
         const event = {
             httpMethod: 'POST',
-            body: { columnTitle: 'Test Column Title' },
+            body: JSON.stringify({ columnTitle: 'Test Column Title' }),
             headers: { 'Content-Type': 'application/json' },
         };
 
@@ -109,7 +109,7 @@ describe('ColumnController', () => {
         const event = {
             httpMethod: 'PUT',
             pathParameters: { columnID: 'test123' },
-            body: { columnTitle: 'Updated Column Title' },
+            body: JSON.stringify({ columnTitle: 'Updated Column Title' }),
             headers: { 'Content-Type': 'application/json' },
         };
 

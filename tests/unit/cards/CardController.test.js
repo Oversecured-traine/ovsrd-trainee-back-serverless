@@ -13,7 +13,7 @@ describe('CardController', () => {
     it('should create a card', async () => {
         const event = {
             httpMethod: 'POST',
-            body: { cardTitle: 'Test Card Title' },
+            body: JSON.stringify({ cardTitle: 'Test Card Title' }),
             pathParameters: { columnID: 'test' },
             headers: { 'Content-Type': 'application/json' },
         };
@@ -126,7 +126,7 @@ describe('CardController', () => {
         const event = {
             httpMethod: 'PUT',
             pathParameters: { cardID: 'test123' },
-            body: { cardTitle: 'Test Card', cardDescription: 'Test description' },
+            body: JSON.stringify({ cardTitle: 'Test Card', cardDescription: 'Test description' }),
             headers: { 'Content-Type': 'application/json' },
             rawHeaders: { 'Content-Type': 'application/json' },
 
