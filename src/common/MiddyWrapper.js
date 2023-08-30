@@ -4,6 +4,7 @@ const httpHeaderNormalizer = require('@middy/http-header-normalizer');
 const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger'); 
 
+
 const middyServices = [
     jsonBodyParser(),
     httpHeaderNormalizer(),
@@ -16,7 +17,8 @@ const applyMiddlewares  = (handler) => {
 };
 
 const applyMiddlewaresToAllMethods = (controller) => {
-    for (const method in Object.getOwnPropertyNames(Object.getPrototypeOf(controller))) {
+    const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(controller));
+    for (const method of methods) {
         if (typeof controller[method] === 'function' && method !== 'constructor') {
             controller[method] = applyMiddlewares(controller[method]);
         }
