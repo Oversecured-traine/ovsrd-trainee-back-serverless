@@ -31,6 +31,3 @@ jobs:
         run: npm test
         env:
           AWS_REGION: ${{ env.AWS_REGION }}
-
-      - name: Deploy Serverless App
-        run: npm start
