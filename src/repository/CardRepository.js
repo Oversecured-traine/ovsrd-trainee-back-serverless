@@ -18,17 +18,18 @@ class CardRepository {
 
         const maxIndex  = await this.getMaxCardIndex(columnID);
         const cardIndex = maxIndex + this.MIN_INDEX;
+        const hasImage = false;
 
         console.log('cardIndex:', cardIndex);
         console.log('columnID:', columnID);
 
         const params = {
             TableName: this.tableName,
-            Item: marshall({ cardID, columnID, cardIndex, cardTitle }),
+            Item: marshall({ cardID, columnID, cardIndex, cardTitle, hasImage }),
         };
         await dynamodb.send(new PutItemCommand(params));
 
-        return { cardID, columnID, cardIndex, cardTitle };
+        return { cardID, columnID, cardIndex, cardTitle, hasImage };
 
     }
 
@@ -62,6 +63,23 @@ class CardRepository {
         await dynamodb.send(new UpdateItemCommand(params));
 
         return { cardID, cardTitle, cardDescription };
+
+    }
+
+    async updateCardImage (cardID)  {
+
+        const params = {
+            TableName: this.tableName,
+            Key: marshall({ cardID }),
+            UpdateExpression: 'SET #attr = :val', 
+            ExpressionAttributeNames: { '#attr': 'hasImage' },
+            ExpressionAttributeValues: marshall({
+                ':val': true,
+            }),
+        };
+        await dynamodb.send(new UpdateItemCommand(params));
+
+        return { cardID };
 
     }
 

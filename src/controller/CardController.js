@@ -54,6 +54,21 @@ class CardController {
         });
     }
 
+    async updateCardImage(event) {
+
+        const cardID = event.pathParameters.cardID;
+
+        if (!cardID) {
+            throw createError.BadRequest('Card ID is missed.');
+        }
+        const operationResponse = await service.updateCardImage(cardID);
+
+        return baseResponse(200, {
+            message: 'Successfully updated a card.',
+            data: operationResponse,
+        });
+    }
+
     async deleteCard(event) {
 
         const cardID = event.pathParameters.cardID;
