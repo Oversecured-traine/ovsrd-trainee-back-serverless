@@ -29,7 +29,7 @@ class CardService {
 
     async updateCardImage (cardID) {
 
-        return await this.repository.updateCard(cardID);
+        return await this.repository.updateCardImage(cardID);
 
     }
 
