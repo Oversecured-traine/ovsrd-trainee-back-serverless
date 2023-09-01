@@ -27,6 +27,12 @@ class CardService {
 
     }
 
+    async updateCardImage (cardID) {
+
+        return await this.repository.updateCard(cardID);
+
+    }
+
     async deleteCard (cardID) {
 
         return await this.repository.deleteCard(cardID);
