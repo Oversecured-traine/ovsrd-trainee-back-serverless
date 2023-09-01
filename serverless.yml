@@ -121,6 +121,14 @@ functions:
           method: PUT
           cors:
             origin: '*'
+    updateCardImage:
+    handler: src/controller/CardController.updateCardImage
+    events:
+      - http:
+          path: /update-card-image/{cardID}
+          method: PUT
+          cors:
+            origin: '*'
   deleteCard:
     handler: src/controller/CardController.deleteCard
     events:
