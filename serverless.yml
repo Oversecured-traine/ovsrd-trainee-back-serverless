@@ -2,17 +2,170 @@ service: task-tracker
 
 provider:
   name: aws
-  runtime: nodejs14.x
-  region: us-east-1 
+  runtime: nodejs18.x
+  stage: dev
+  region: ${self:custom.region}
+  environment:
+    COLUMNS_TABLE_ARN: ${env:COLUMNS_TABLE_ARN}
+    CARDS_TABLE_ARN: ${env:CARDS_TABLE_ARN}
+    COLUMNS_TABLE_NAME: ${env:COLUMNS_TABLE_NAME}
+    CARDS_TABLE_NAME: ${env:CARDS_TABLE_NAME}
 
-functions:
-  getMessage:
-    handler: getMessage.handler
-    name: get-message
-    events:
-      - http:
-          path: /
-          method: GET
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource: 
+          - ${self:provider.environment.COLUMNS_TABLE_ARN}
+          - ${self:provider.environment.COLUMNS_TABLE_ARN}/*
+          - ${self:provider.environment.CARDS_TABLE_ARN}
+          - ${self:provider.environment.CARDS_TABLE_ARN}/*
+
 
 plugins:
   - serverless-offline
+
+custom: 
+  region: eu-west-1
+
+functions:
+  # ColumnController methods
+  createColumn:
+    handler: src/controller/ColumnController.createColumn
+    events:
+      - http:
+          path: /create-column
+          method: POST
+          cors:
+            origin: '*'
+  getColumn:
+    handler: src/controller/ColumnController.getColumn
+    events:
+      - http:
+          path: /get-column/{columnID}
+          method: GET
+          cors:
+            origin: '*'
+  updateColumn:
+    handler: src/controller/ColumnController.updateColumn
+    events:
+      - http:
+          path: /update-columns/{columnID}
+          method: PUT
+          cors:
+            origin: '*'
+  deleteColumn:
+    handler: src/controller/ColumnController.deleteColumn
+    events:
+      - http:
+          path: /delete-columns/{columnID}
+          method: DELETE
+          cors:
+            origin: '*'
+  getColumns:
+    handler: src/controller/ColumnController.getColumns
+    timeout: 15
+    events:
+      - http:
+          path: /columns
+          method: GET
+          cors:
+            origin: '*'
+  getMaxColumnIndex:
+    handler: src/controller/ColumnController.getMaxColumnIndex
+    events:
+      - http:
+          path: /columns/maxIndex
+          method: GET
+          cors:
+            origin: '*'
+  moveColumn:
+    handler: src/controller/ColumnController.moveColumn
+    events:
+      - http:
+          path: /columns/{columnID}/{prevColumnIndex}/{nextColumnIndex}/move
+          method: PUT
+          cors:
+            origin: '*'
+
+  # CardController methods
+  createCard:
+    handler: src/controller/CardController.createCard
+    events:
+      - http:
+          path: /create-card/{columnID}
+          method: POST
+          cors:
+            origin: '*'
+  getCard:
+    handler: src/controller/CardController.getCard
+    events:
+      - http:
+          path: /get-card/{cardID}
+          method: GET
+          cors:
+            origin: '*'
+  updateCard:
+    handler: src/controller/CardController.updateCard
+    events:
+      - http:
+          path: /update-card/{cardID}
+          method: PUT
+          cors:
+            origin: '*'
+  updateCardImage:
+    handler: src/controller/CardController.updateCardImage
+    events:
+      - http:
+          path: /update-card-image/{cardID}
+          method: PUT
+          cors:
+            origin: '*'
+  deleteCard:
+    handler: src/controller/CardController.deleteCard
+    events:
+      - http:
+          path: /delete-card/{cardID}
+          method: DELETE
+          cors:
+            origin: '*'
+  getCards:
+    handler: src/controller/CardController.getCards
+    events:
+      - http:
+          path: /cards
+          method: GET
+          cors:
+            origin: '*'
+  getCardsByColumnID:
+    handler: src/controller/CardController.getCardsByColumnID
+    events:
+      - http:
+          path: /columns/{columnID}/cards
+          method: GET
+          cors:
+            origin: '*'
+  moveCard:
+    handler: src/controller/CardController.moveCard
+    events:
+      - http:
+          path: /cards/{cardID}/{columnID}/{prevCardIndex}/{nextCardIndex}/move
+          method: PUT
+          cors:
+            origin: '*'
+  getMaxCardIndex:
+    handler: src/controller/CardController.getMaxCardIndex
+    events:
+      - http:
+          path: /columns/{columnID}/maxIndex
+          method: GET
+          cors:
+            origin: '*'

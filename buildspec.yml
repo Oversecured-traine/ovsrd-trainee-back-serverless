@@ -1,0 +1,14 @@
+version: "0.2"
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      - npm install -g serverless
+      - npm install
+      - npm run lint
+      - npm run test
+  build:
+    commands:
+      - sls deploy
