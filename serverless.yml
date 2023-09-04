@@ -3,7 +3,7 @@ service: task-tracker
 provider:
   name: aws
   runtime: nodejs18.x
-  stage: dev
+  stage: main
   region: ${self:custom.region}
   environment:
     COLUMNS_TABLE_ARN: ${env:COLUMNS_TABLE_ARN}
